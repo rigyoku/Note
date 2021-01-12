@@ -1,0 +1,9 @@
+点击对应仓库的setting 在最下方的Danger Zone可以删除 删除需要填写 用户名/项目名.
+除了可以选择文件来提交,具体每行文件也可以控制提交. 蓝色表示选中状态用来提交,绿色表示未选中.
+change 里面的undo可以在本地[即没提交到github网站上]撤销提交,对应的历史也会消失.
+已经发布的版本想回滚,使用revert this commit. 会在历史中保留回滚操作的履历.
+代码和服务器冲突会报错 [The repository has been updated since you last pulled. Try pulling before pushing]. 先pull把代码拉下来
+	在change画面可以看到对比,右侧会有三角警告符提示冲突,代码会用冲突标识符提示冲突[<<<head === >>>版本号].
+可以使用github来构建一个主页. [https://pages.github.com/] [可以选择 个人组织/项目网站 自动生成/手写]
+	需要在对应项目下新建一个分支 gh-pages, 并添加index.html文件来创建主页.
+github网页快捷键 :T 查找文件.

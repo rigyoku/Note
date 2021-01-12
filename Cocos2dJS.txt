@@ -1,0 +1,83 @@
+1.	项目结构: 
+		assets[本地资源/脚本/第三方库],只有assets目录下内容会显示在资源管理器中,其中每个文件都会有一个对应的.meta文件
+		library[由assets导入后生成],用于发布
+		local[本机配置信息]
+		packages[自定义扩展插件]
+		settings[项目设置],包名和平台等信息
+		temp[临时文件]
+		project.json[和assets文件夹一起作为合法性标志],需要该文件才能被cocos creater作为项目打开
+		build[保存用于发布的工程]
+		注意提交git只需要提交: assets,packages,setting,project.json即可
+2.	属性检查器中,蓝色表示需要拖拽资源,白色表示需要拖拽节点
+3.	场景[scene]是游戏的主体,场景加载后会自动加载组件所需脚本,实现逻辑功能
+4.	场景内容放在画布[canvas]下,可以根据分辨率自动完成缩放
+5.	cc.class用于在cc[Cocos简写]命名空间下创建类,属性放在properties属性中[可以在属性检查时随时修改]. 完整的屬性声明包括[default/displayName/tooltip/type/visible/serializable]
+	分别是默认值,显示在检查器的名称,鼠标悬浮的提示,数据类型,是否显示在检查器,是否保存该属性
+6.	动作就是节点的位移,缩放和旋转
+7.	cc.moveBy 节点相对于当前位置移动, 参数分别是 时间,移动后坐标[cc.v2(x,y)] [或者 时间,移动后x,移动后y]. 返回ActionInterval 对象,表示动作在一定时间内完成.
+8.	ActionInterval.easing() 使当前动作按照指定速度曲线执行,返回ActionInterval对象. 
+9.	cc.repeatForever() 用于重复动作. cc.sequence
+10.	node.runAction() 用于执行动作. node.stopAllActions 用于停止动作
+11.	cc.systemEvent.on 用于监听事件. 注意在destory时候off掉事件监听
+12.	cc.SystemEvent.EventType.KEY_DOWN/KEY_UP 键盘输入事件
+13.	update 方法在场景加载后每帧调用一次,一般放入需要计算的操作. onload在场景加载后调用,一般放入初始化操作.
+14.	Prefab[预制] 用于需要重复生成的节点. 可以直接在类的properties中
+15.	cc.instantiate 实例化prefab对象,或者复制其他对象.
+16.	node.addChild 在该节点下添加子节点
+17.	node.setPosition 设置节点在父节点中的位置[相对锚点],可以传递2个参数x和y,也可以传v2型点坐标. node.getPosition 可以获取节点在父节点的位置
+18.	node.getComponent 可以根据名字获得该节点上组件的引用
+19.	node.y 获取锚点位置的y坐标
+20.	场景中最下面的节点在最前面
+21.	cc.director.loadScene 加载指定场景
+22.	cc.callFunc 声明回调,返回值是一个ActionInstant类型[瞬间动作],即进行动作触发回调
+23.	cc.audioEngine.playEffect 调用声音引擎播放音频
+24.	获取场景大小可以用this.node.parent去获取canvas大小然后去计算[前提是canvas根据场景去缩放的]
+25.	根据需要可以添加碰撞组件,分为圆形,矩形和多边形,然后在项目设置中管理碰撞分组. 碰撞需要手动去开启[manager.enabled = true;].可以分别在碰撞前,碰撞时和碰撞后进行监听回调.
+26.	不同场景传递数据可以保存成全局变量[window.xxx],声明时需要window而调用可以调用不需要window.也可以通过require其他js实现.
+27.	cc.director.getScene()可以获得场景
+28.	自带顺序的图片需要使用的sizemode是raw,而自动裁剪可以用trimed,自己裁剪用customer
+29.	位图字体由fnt格式的索引和png格式的字体图构成,都需要导入[为了效率应该单独放置一个文件夹]. 而动态字体ttf格式可以直接导入使用
+30.	使用getComponent去查找组件可能找不到返回null,需要check提高健壮性.
+31.	大量相同类型节点应由全局脚本统一管理,然后通过父节点获得子节点[node.children或者getChildByName],如果层级较深可以cc.find根据路径去查找
+32.	node.children 和 node.childrenCount 只会返回直接子节点,而不会返回子节点的子节点信息.
+33.	修改节点: 
+		位置: node.x || node.y || node.setPosition() || node.position
+		旋转: node.ratation || node.setRatation()
+		缩放: node.scaleX || node.scaleY || node.setScale()
+		尺寸: node.setCOntentSize() || node.width || node.height
+		锚点: node.anchorX || node.anchorY || node.setAnchorPoint()
+		颜色透明度: node.color / node.opacity
+34.	脚本的生命周期:
+		onLoad: 节点首次激活时触发,start之前
+		start: 第一次激活前,第一次update之前触发
+		update: 每一帧渲染触发,会在所有动画更新前执行
+		lateUpdate: update执行完触发,等待动画,粒子和物理效果
+		onEnable: enabled从false变true,或者active从false变true触发.如果第一次被创建且激活,会在onLoad和start中间
+		onDisable: 和onEnable相反时调用
+		onDestroy: 当前组件或节点调用了destroy(),在当前帧结束后统一回收组件
+35.	除了在场景编辑器中,代码也可以创建节点[new cc.Node('')],也可以通过cc.instantiate克隆一个节点或者创建预制节点.
+36.	调用node.destory()会销毁节点,但是不是立即消除,而是当前帧更新完毕才会销毁.可以通过cc.isValid来判断是否销毁.
+37.	可以调用API: cc.game.addPersistRootNode()把节点变成常驻节点,可以在切换场景时不被销毁.对应方法removePersistRootNode来把常驻节点变回普通节点
+38.	场景的预加载: cc.director.preloadScene,而切换还是手动调用loadScene
+39.	动态加载的资源放在resource目录下[位于assets根目录下],且资源加载是异步的,需要在回调函数获得资源.使用cc.loader.loadRess()加载资源.参数是相对于resource的路径[,类型]和回调[注意路径不带扩展名]
+40.	图集的加载需要整体加载进来再去单独获取图片. res.getSpriteFrame().
+41.	动态加载的资源使用 cc.loader.releaseRes来释放,参数和加载时前2个参数一样. 资源的批量加载使用cc.loader.loadResDir()
+42.	应用内资源使用loadRes,而其他资源使用load直接加载,比如网络请求和其他路径的资源.
+43.	释放了一个资源后,相关引用不会被释放,因为可能被其他资源引用.
+44.	使用node.on或者node.once来进行事件的监听(第3个参数可以直接传this). 关闭监听使用off,参数和on完全一致.
+45.	使用node.emit发射事件,使用node.dispatchEvent来派送事件. 发射事件最多5个参数. 派送事件是将事件向上冒泡直到遇到event.stopPropagation()
+	派发的事件需要是cc.Event.EventCustom()实例而不是抽象的cc.Event类
+46.	不同级别的节点存在事件冒泡,而同级别的节点只会接收到一个事件,且归属于顶层节点.
+47.	有时需要在注册阶段就捕获事件,可以在注册时传入第4个参数true,只有鼠标和触摸事件能在注册时触发[用于先触发父节点,然后再触发本节点,最后冒泡]
+48.	可以手动关闭多点触控: cc.macro.ENABLE_MULTI_TOUCH = false;
+49.	节点的事件可以暂停和恢复: node.pauseSystemEvent() || node.resumeSystemEvent()
+50.	全局事件不和节点相关,由cc.systemEvent统一派发.
+51.	动作系统用于对节点的位移,缩放和旋转等动作,不能代替动画系统.
+52.	除了cc.sequence可以按顺序执行动作,还有cc.spawn同步执行动作,cc.repeat重复指定次数动作,cc.speed控制执行速度
+53.	cc.tween(node) 缓动系统.类似于动作系统,链式操作,最后调用start()开始顺序执行. cc.tween.to 运行结果就是属性值. cc.tween.by 运行结果是设置值加原值.
+	除了可以使用easing进行函数式缓时,还可以自定义progress[需要cc.vec3]. cc.tween().clone(target)可以把缓动复制给target节点. 
+	不同缓动系统还可以使用then链接,顺序执行; 想同步执行可以用parallel链接; cc.tween.call声明回调;delay可以延迟固定秒数执行; repeat单参数是重复上一个缓动的次数,2个参数是重复指定缓动的次数
+54.	计时器schedule. component.schedule(f, time)来定时执行回调; component.schedule(f, 间隔, 重复次数, 第一次开始的延迟)
+	component.scheduleOnce(f, time) 只执行一次的计时器; 可以在回调中用component.unSchedule解除计时器
+55.	由于游戏逻辑一般由一个脚本统一控制,可以分别require加载子脚本,然后调用初始化方法来控制执行顺序. 主脚本的update方法分别调用子脚本的updateF
+	同一个组件下的脚本,在编辑器里上面的执行顺序在下面的脚本前面. 也可以手动设置executionOder来控制顺序[默认0,值越小越先执行]

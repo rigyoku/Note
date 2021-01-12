@@ -1,0 +1,46 @@
+1.	webpack本质是js程序静态模块打包器.
+2.	核心概念: 入口,出口,loader,插件.
+3.	入口entry: 配置webpack使用那个模块作为依赖的开始. 使用entry属性来配置.
+4.	出口output: 配置打包结果的路径和文件名. 使用output属性来配置. [output.path / output.filename]
+5.	loader: 让webpack处理非js文件.[webpack本身只理解js] 使用module.rules配置过滤器和转换器. [module.rules.test / module.rules.use]
+6.	插件plugins: 使用require来引入插件并添加到plugins数组中. 也可以new创建插件实例放入数组.
+7.	直接配置入口entry: xxx是entry: {main:xxx}的简写. 也可以entry:{app:xx, vendors:xx}来引入.
+8.	配置出口最少需要配置路径path和文件名filename. 多入口也只能配置一个出口,使用占位符[如[name].js这样的]写法来实现分别输出.
+9.	模式mode分为 'development' / 'production' 2种. 除了配置文件还可以用CLI配置 [webpack --mode=production]
+10.	loader用于对模块的源代码进行转换. 为了对应不同类型文件需要先安装对应loader. 3种使用loader的方式: 配置/内联/CLI
+	配置方式: rules: [{test: /\.css$/, use: [{loader1: xx}, {loader2: xx, options: {a: x}}]}] 可以为一个test指定多个use去loader.[推荐使用]
+	内联方式: import xx from '[loader1]![loader2?options]![path]' 通过!分开loader,通过?传递参数.[可以是?key=val形式也可以是?json形式]
+	CLI: webpack --module-bind jade-loader --module-bind 'css=style-loader!css-loader' 对jade文件使用jade-loader,对css使用style-loader/css-loader
+11.	loader支持链式传递.按照相反顺序执行,在第一个loader传递给下一个loader,最后的loader返回预期的js. loader可以同步也可以异步. loader运行在node.js中,可以执行任意操作.
+	loader结束查询参数,loader也可以用options参数配置. 普通npm模块也可以导出成为loader[需要在package.json定义loader字段]
+12.	插件是webpack的支柱功能,目的在于解决loader无法实现的事. webpack插件是具有apply属性的js对象. apply属性会被webpack compiler调用,且compiler对象在整个生命周期可以访问.
+	compiler hook的tap方法的第一个参数应该是驼峰式命名的插件名. 插件的用法包括配置和nodeapi
+	配置: 通过require引入插件并创建实例传入配置文件的plugins数组中.[推荐使用]
+	nodeapi: require('webpack')引入webpack运行时, 再引入配置文件, 并且webpack(conf)来获得compiler对象, 调用apply并传入插件实例, 最后run来调用. [node使用插件也需要在配置中传入plugins数组]
+13.	npm超时,可以在node下的module下的npm文件夹下修改npmrc文件,添加 registry = https://registry.npm.taobao.org 使用镜像
+	开发环境安装应该是 npm install --save-dev,生产环境是 npm install --save.[和npm install命令不同,带--save会修改package.json]
+14.	使用webpack创建Demo: 先创建文件夹, 例如命令: mkdir xx && cd xx; 使用命令 npm init -y来创建默认的package.json文件; 使用命令 npm install webpack webpack-cli --save-dev来安装webpack和cli
+	在package.json中移除main防止意外发布,添加private保证私有.
+	将源代码(src)从分发代码(dist)分离[源代码是编辑的代码,分发代码是浏览器加载代码],将原来使用脚本引用的包通过npm安装并修改package.json后,通过import来引用.
+	执行命令 npx webpack来输出main.js
+15.	在目录下创建xx.js来添加配置文件,使用 npx webpack --config xx.js来构建,相对于cli的方便,配置文件更加灵活.
+16.	可以在package.json的scripts里面添加npm脚本,如 build: webpack,这样就可以 npm run build来执行构建.
+17.	webpack根据正则来处理loader的匹配机制.
+	处理css可以使用loader: style-loader和css-loader,这样可以在module中引入css,相当于在header插入style样式.
+	处理图片可以谁用loader: file-loader.引入图片之后会把图片添加到output目录,并且获得的变量是图片的url
+	file-loader和url-loader可以处理任意类型的文件,所以字体文件仍然可以用file-loader处理.通过@font-face引入,并通过url指令配置字体.
+	NodeJS和JSON类型是内置的,而csv,tsv和xml可以用csv-loader和xml-loader来处理.[在使用d3做可视化时预处理数据很有用,不通过ajax而是直接引用数据]
+	通过loader加载资源,实现了资源的解耦合,不会都放在一个统一文件夹下.
+18.	在html中手动引入资源时,在资源变更时还要手动修改不方便.安装插件 html-webpack-plugin 来管理html.[默认创建index.html]
+	通过 clean-webpack-plugin 来清理dist目录.[在构建之前清空文件夹,重新构建后只有使用到的文件]
+19.	开发工具[不要在生产环境使用]: 在打包成bundle时,出错不会再细化到js文件,不好调试,可以使用sourcemap来追踪. 在配置文件的module中添加属性 devtool:'inline-source-map',
+	每次改修都需要重新编译才有效,可以使用webpack的选项来完成自动编译
+	观察模式: scripts: {watch: 'webpack --watch'} 进行编译后不退出,在文件变更时重新编译,需要刷新浏览器
+	服务器: webpack-dev-server 提供简单服务器,实时重新加载. 安装模块后在配置文件使用devServer属性指定contentBase目录来创建localhost:8080服务. 还需要配置脚本来启动 'webpack-dev-server --open'
+	中间件: webpack-dev-middleware 被服务器模式使用,同时也可以单独使用.是一个容器,把webpack处理后的文件传给server. 安装模块,在配置中添加publishPath,创建express服务使用webpackDevMiddleware中间件.
+	部分编辑器具有安全写入功能,需要禁用.
+20.	模块热替换是webpack最有用的功能之一,允许运行时更新模块而无需完全刷新.
+	如果使用的是webpack-dev-server,启动热替换只需要更新配置和使用hmr插件. 在devServer添加hot: true属性,插件中添加webpack.NamedModulesPlugin和webpack.HotModuleReplacementPlugin
+	引用namedModulesPlugin为了更容易查看要修补的依赖.在引用模块的地方判断module.hot并使用module.hot.accept来监听模块变更. 如果使用中间件需要在server上启动hmr并使用webpack-hot-middleware包.
+	在使用devServer+nodeApi时,不要写在conf中,而是在创建时传入hot参数,还需要为devServer添加hmr入口,使用addDevServerEntrypoints(conf, options)
+	如果是已经注册的事件,使用热替换不会默认进行替换,可以通过重新创建dom并监听的方式实现.通过loader可以实现自动替换.比如style-loader和cssl-loader在更改css文件后画面会自动变更而无需刷新.
