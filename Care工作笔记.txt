@@ -1,0 +1,101 @@
+$.Deferred()是jQuery的回调函数解决方案. 在jQuery1.5之后可以使用链式写法: $.ajax({}).done(function(){}).fail(function(){}). done可以有多个,按照顺序执行.
+	多个操作同时执行使用when方法[$.when(a,b).done().fail()],注意when的参数是Deferred对象,不局限于ajax. 调用resolve改变状态会进入done方法,调用reject改变状态会进入fail方法.
+	状态只能改变一次[dfd.promise()返回一个不能改变状态的对象],when中一个失败就进入fail,都成功才会done[执行fail/done完毕后进入always].
+	then方法接收2个参数作为done和fail,只有一个参数时等价于done.
+	使用$.Deferred(function)实例化dfd对象时传入一个方法作为参数,该方法的参数就是该实例dfd对象; dfd.promise(function)传入一个方法,该方法获取done和fail接口,dfd改变状态进入接口.
+Radio.channel(key) 广播机制,根据key匹配频道,可以解耦合. on/trigger为一套,用于监听/触发事件, reply/request为一套,相当于带返回值的on/trigger.
+操作对象前最好判断一下是否存在,放在操作空对象报错
+Marionette框架: 基于Backbone.js,Underscore的前端框架. 提供特定的view.
+	使用时先创建Application实例, 然后创建collection盛装model, 创建数据对应的view, 添加区域, 在区域上show该view即可.
+	collectionView会遍历model显示,创建时可以指定childView和collection还有options参数[collection级别的变化,如add/remove/sort/reset会刷新view,model级别的变化不会刷新].
+	设置renderOrSort参数为true时,更改排序就只会调整位置而不更新dom内容. tagName是内容的父标签, className是父标签的class, 设置样式可以通过attribute来写style.
+	view通过serializeData方法将数据渲染到画面上[默认返回this.model.toJson]. 如果数据不同影响画面模板,可以重写getChildView方法对应不同数据显示不同画面.
+Backbone.model: get方法直接取数据, escape方法在取数据之前会先把数据中HTML字符转出实体形式防止XSS攻击[" => &quot;]
+	on('change')和on('change:attr')都可以监听属性变换,后者先触发. 使用unset('attr')删除属性.
+	pervious方法接收属性名作为参数,返回该属性修改前的状态.perviousAttributes()方法返回变更之前的对象,包含所有属性.[change方法中有效,因为set修改会连同上一状态一起修改]
+	validate方法对属性进行判断,验证失败会返回字符串被on('error')方法接收,通过验证返回undefined.在set时可以添加error回调参数,比整体验证先处理该方法.
+	设置silence属性不会调用change/error方法,可以用pervious回滚数据.
+eclipse保存卡顿可以把自动build关了. 复制卡顿可以把.project文件倒数2行的check删了.
+由于this指向调用方法的对象,模块的方法内this指向不是原对象,可以先保存this再后续使用[例如self=this].
+js闭包 在全局调用局部变量[方法内一个方法调用了内部变量,最后返回了该方法.[注意let/const的块级作用域和var区别]],让局部变量不被垃圾回收机制回收掉.
+尽量使用 === 而不是 == 来做相等判断[==会进行类型转换].
+使用eval可以把字符串当做js语句执行, 但是不建议使用.
+循环避免使用continue和break[continue可以更改判断逻辑,break可以更改跳出条件]. switch语句加break增加可读性.
+声明函数: function do() {} 和 var do = function() {} 两种方式,第一种会被提前到代码头, 所以建议采用第二种方法[由于var特性,do会被在头部声明而没有实例化,采用const/let不会提前声明].
+创建对象和数组时尽量采用{} 和 [],而不是new Object() 和new Array().
+使用new创建对象时,this指向对象本身. 构造方法拥有原型prototype属性[不局限构造方法,所有方法都有],每个使用该构造方法实例化的对象共用一个原型. 
+	当调用对象属性时,先在对象内部查找,没有再去原型查找. hasOwnProperty('pro')可以判断该属性是否是自身的. 可以用 'pro' in obj 判断是否包含某属性, 也可以 for(pro in obj) 遍历属性.
+	一个构造方法F.prototype.constructor指向F本身. 原型链的顶部是Object,而Object没有__proto__属性所有到此为止. 需要共享放在原型,独立属性放在构造方法.
+	可以手动修改构造方法的prototype,但是将原型修改之后其构造方法会变更需要重新指定. [注意:实例拥有属性,方法拥有原型]
+js是先解析后执行,如果直接判断变量是否存在可能会报错,使用typeof判断undefined来判断. else中没执行的var也会被提前声明.
+	函数名冲突会覆盖,变量名冲突会忽略.既有函数又有变量,会使用函数.
+js以分号结尾,不加分号不报错是因为解释器自动补全了分号.
+jQuery的filter可以对选择器结果进行过滤, eq可以获取选择器的第n个值, next取到选择器后第一个指定标签, closest取得选择器最近的指定父标签, siblings取得同级元素.
+	jQuery的链式写法可以使用end()后退一步. 选择器取值只取第一个,赋值会修改所有.
+	insertAfter/after 插入到后面/移动到后面 appendTo/append 内部插入. empty方法清空元素, $('<p>')创建一个新元素.
+	可以为一个元素同时bind多个事件来让其执行一个回调, one监听只触发一次, unbind来解除监听.
+	jQuery自带动画函数, slideUp/slideDown 卷曲. fadeOut/fadeIn/fadeTo 淡入/淡出/调整透明度. 参数除了动画时间,还可以传入回调.
+	还可以自定义动画animate({opacity:0.5}, time, func). stop和delay可以停止/延缓动画, 设置$.fx.off为true可以关闭网页所有动画.
+	id/类型选择器速度最快,其次是类选择器,伪类选择器最慢. 原生js速度更快.
+	链式写法默认缓存可以提高效率,防止选择器耗时.
+	事件存在冒泡机制, 可以在父元素监听, 顶层使用$(document).on()
+	修改dom开销很大,应该整齐插入而不是一条条插入. 大量处理时,应该使用detach[移除元素并保留副本,用于再插入]取出dom操作完再插入.
+	多个事件都要被触发时,应该按顺序触发,即一个结束触发另一个,不要一起触发.
+	$.extend(flag, target, obj...)将obj等一系列对象合并到target对象上; flag默认为false, 当设置为true时,同名属性如果是对象,该对象也会合并而不是覆盖.
+	$.fn指的是jQuery命名空间,对$.fn扩展对每个jQuery都有效,等价于jQuery.prototype.
+cookie设置httpOnly之后就不能被js读取了,有效防止XSS[恶意脚本]攻击. 设置secure将会只允许https通信. 使用JWT认证,将服务器加密后json放在请求头的Authorization放在XSRF[盗用登录信息]攻击.
+setInterval来定时循环方法, clearInterval停止该循环.
+声明后直接调用的立即执行函数,可以产生局部变量让外部无法访问,也可以保存某个参数当时的状态[防止闭包作用域无法保存多个状态的变量问题].
+event.target/currentTarget区别在于: target是触发的元素, currentTarget是事件绑定的元素.
+修改dom属性时,如果是固有属性,应该使用prop方法,自定义的属性,应该使用attr方法[checkbox的值是不一样的].
+dom.data可以赋值和取值.
+选择器修改样式时,注意范围,可能影响到不该变化的元素.
+script标签加载js虽然方便,但是存在问题: 标签按照顺序加载,需要按依赖性引用; 同步加载js的话可能卡住页面; 动态生成引入js标签会导致dom.ready和window.onload对该文件无效,因为不在dom结构中.
+LAB链加载js: 引用LAB.js,然后使用$LAB.script('xx').script('xx')来顺序引用脚本,中间可以加wait/wait(func)等上一步加载,不加就是同步加载.
+RequireJS不控制加载顺序,全部加载完执行回调[require([xx,xx],funciton(){})].
+	shim可以将某个模块的全局变量暴露给require,当做这个模块的引用. 需要暴露多个变量时,使用init: function(){return {a1:1,a2:2}}.普通require无法获得模块的全局变量.
+	加载过来的全局变量赋给window,可以通过window.a1获取.
+	虽然require插件可以避免页面阻塞,但是插件本身还是可能阻塞,可以放到html后引入或者设置async=true defer[兼容ie].
+	引入后指定data-main作为js入口,require.config的baseUrl会加到paths之前解析路径.
+	require提供一系列插件,text/image/json/mdown插件加载对应类型文件,domready让回调在页面加载完执行.
+由于js解释器自动补全分号,return [换行] {};时,会返回undefined而不是该对象.
+调用函数时,括号和函数名不加空格; 声明函数时,函数名和参数没有空格; 其他情况左括号前均有空格.
+不要使用with语句,不要使用自加[改用a+=1],句尾不要省略分号,不要贪图简略造成难以理解代码[if(a=b)].
+变量应该放在函数头部声明. 构造函数首字母大写, 全局变量全部大写[少用全局变量].
+创建js类: 构造方法; Object.create; 对象内部方法返回一个实例[极简主义法].
+AMD规范: 异步模块定义,采用require([],func)来加载模块执行回调. CommonJS是同步加载.
+	使用define([],func)定义模块, 没有依赖时可省略第一个数组参数执行写方法.
+严格模式: 消除js语法不合理/不严谨之处, 保证安全, 提高编译器效率, 为新版本js铺垫.
+	对于整个脚本而言,将use strict放在第一行时整个脚本严格模式运行; 不放在第一行按普通模式运行[注意严格和非严格的代码合并].为了合并方便,整个代码块可以放在立即执行函数中.
+	严格来讲,前面的代码没有运行结果比如一个分号,可以不把use strict放在第一行.
+	一个画面有多段js代码,全部严格模式需要对每段代码都加上use strict. 对于单个方法而言, 方法第一行加use strict后整个方法严格模式运行.
+	一个没声明的变量就赋值,在普通模式没问题[会声明成全局变量],但是严格模式报错. [严格模式对动态绑定做了限制来提高编译效率: 禁止with和创建eval作用域]
+	严格模式不允许this指向全部变量[构造方法不加new报错],禁止内部遍历调用栈. 不能直接删除变量. 只有属性配置为configurable为true的才能删除.
+	严格模式下列操作会报错: 修改只读属性[writable:false], getter方法赋值[对return对象赋值], 禁止扩展的对象添加属性[Object.preventExtensions(obj)禁止扩展], 删除不能删除的属性.
+	方法的形参命名重复在正常模式不报错,通过arguments[i]可以访问,严格模式下直接报错. 对象的重名属性在IE的严格模式下报错,chrome不报错.
+	严格模式的Chrome不允许数字0开头, IE允许. 严格模式不允许对arguments赋值,且不记录其变更[即修改了参数再去arguments[i]仍是原值,不可以调用arguments.caller]
+	严格模式新增了保留字: implements/interface/let/package/private/protected/public/static/yield;
+source maps: 记录代码压缩前后映射位置,chrome的f12开启enable JavaScript source maps,这样定位就不是压缩后位置.
+设置最高版本IE渲染: <meta http-equiv="X-UA_Compatible" content="IE=edge"/>
+Beyond compare可以ctri + i显示差分结果汇总.
+有些模块在定义时指定了模块名,就不能在引用时指定别的名字,比如define('jQuery',[],()=>{})就被定义成了jQuery.
+underscore的延迟执行[防抖]: _.throttle在接到任务后计时15秒,到时间执行所有任务. _.debounce接到任务开始计时15秒,再接到任务会重新计时.
+	_.throttle(func, time, {leading: false, trailing: false}) 参数是要执行的方法,延迟时间,忽略开始边界,忽略结尾边界.
+	_.debounce(func, time, flag) 参数是要执行的方法,延迟时间,flag设true会在开始边界执行而不是结束边界.
+console.dir(obj)可以列出对象所有属性和方法.
+创建httpUrlConnection时,是本地向URL创建一个流. 从URL向本地为输入, 从本地向URL为输出.
+SQL插入单引号时需要把单引号换成2个单引号.
+Tomcat读取config文件,编译后存放java/jsp文件到catalina路径下.
+log4j可以用stdout重定向输出.
+
+
+
+
+
+
+
+
+
+
+
+
