@@ -10,11 +10,22 @@ Marionette框架: 基于Backbone.js,Underscore的前端框架. 提供特定的vi
 	collectionView会遍历model显示,创建时可以指定childView和collection还有options参数[collection级别的变化,如add/remove/sort/reset会刷新view,model级别的变化不会刷新].
 	设置renderOrSort参数为true时,更改排序就只会调整位置而不更新dom内容. tagName是内容的父标签, className是父标签的class, 设置样式可以通过attribute来写style.
 	view通过serializeData方法将数据渲染到画面上[默认返回this.model.toJson]. 如果数据不同影响画面模板,可以重写getChildView方法对应不同数据显示不同画面.
-Backbone.model: get方法直接取数据, escape方法在取数据之前会先把数据中HTML字符转出实体形式防止XSS攻击[" => &quot;]
+Backbone: get方法直接取数据, escape方法在取数据之前会先把数据中HTML字符转出实体形式防止XSS攻击[" => &quot;]
 	on('change')和on('change:attr')都可以监听属性变换,后者先触发. 使用unset('attr')删除属性.
 	pervious方法接收属性名作为参数,返回该属性修改前的状态.perviousAttributes()方法返回变更之前的对象,包含所有属性.[change方法中有效,因为set修改会连同上一状态一起修改]
 	validate方法对属性进行判断,验证失败会返回字符串被on('error')方法接收,通过验证返回undefined.在set时可以添加error回调参数,比整体验证先处理该方法.
 	设置silence属性不会调用change/error方法,可以用pervious回滚数据.
+	使用model自带方法通信需要服务端支持REST构架,create/read/update/delete分别对应RequestMethod为POST/GET/PUT/DELETE.id属性表示修改哪条数据,通过idAttribute可以自定义id属性.
+	id应该由服务器创建并保存到DB,客户端创建的模型不会添加id属性,通过isNew()可以判断是否是客户端新建的模型.
+	默认采用PATHINFO方式访问服务器接口,将id追加到url后面[动态路由]. 3种方式定义URL, urlRoot/url/save方法传入url参数, 优先级为倒序.
+	save方法会判断isNew,新建模型采用POST,原有更新采用PUT, 而fetch方法只是取数据, destroy删除模型.[save方法可以设置wait参数来确认服务器的返回值,没有返回值或者返回失败会还原模型]
+	实际API可能和前台的数据模型不匹配,使用parse方法进行转型赋值. 画面更新应该放在save的回调中,业务逻辑放在change的监听中.
+	fetch会传id查询,destroy会从collection和服务器移除模型,但是模型本身数据不会移除,使用unset/clear移除,delete也可以用wait参数提供回滚功能.
+	不支持REST的服务器使用backbone做通信,可以重写sync方法[也可以同步到本地DB]. 3个参数分别是method,model,options,代表要进行的操作,要同步的数据,适配规则.
+	collection的comparator属性来定义排序规则, collection.pluck可以从集合拉取某个属性的集合, where方法根据属性进行匹配返回所有结果, findWhere返回第一个匹配结果.
+	collectionView的filter可以过滤model,返回true的才显示. region.currentView指向该区域显示的view.
+	Radio.channel.trigger去触发一个没注册的监听,不会报错.
+	layoutview有region属性,compositeview有childRegion属性.
 eclipse保存卡顿可以把自动build关了. 复制卡顿可以把.project文件倒数2行的check删了.
 由于this指向调用方法的对象,模块的方法内this指向不是原对象,可以先保存this再后续使用[例如self=this].
 js闭包 在全局调用局部变量[方法内一个方法调用了内部变量,最后返回了该方法.[注意let/const的块级作用域和var区别]],让局部变量不被垃圾回收机制回收掉.
@@ -43,6 +54,7 @@ jQuery的filter可以对选择器结果进行过滤, eq可以获取选择器的�
 	多个事件都要被触发时,应该按顺序触发,即一个结束触发另一个,不要一起触发.
 	$.extend(flag, target, obj...)将obj等一系列对象合并到target对象上; flag默认为false, 当设置为true时,同名属性如果是对象,该对象也会合并而不是覆盖.
 	$.fn指的是jQuery命名空间,对$.fn扩展对每个jQuery都有效,等价于jQuery.prototype.
+	dom的offset().top可以取得相对屏幕偏移量.
 cookie设置httpOnly之后就不能被js读取了,有效防止XSS[恶意脚本]攻击. 设置secure将会只允许https通信. 使用JWT认证,将服务器加密后json放在请求头的Authorization放在XSRF[盗用登录信息]攻击.
 setInterval来定时循环方法, clearInterval停止该循环.
 声明后直接调用的立即执行函数,可以产生局部变量让外部无法访问,也可以保存某个参数当时的状态[防止闭包作用域无法保存多个状态的变量问题].
@@ -58,6 +70,7 @@ RequireJS不控制加载顺序,全部加载完执行回调[require([xx,xx],funci
 	虽然require插件可以避免页面阻塞,但是插件本身还是可能阻塞,可以放到html后引入或者设置async=true defer[兼容ie].
 	引入后指定data-main作为js入口,require.config的baseUrl会加到paths之前解析路径.
 	require提供一系列插件,text/image/json/mdown插件加载对应类型文件,domready让回调在页面加载完执行.
+	waitSecond参数设置超时时间,设为0表示不会超时.urlArgs表示url后面的防止缓存参数,config属性使用Module.config取出,是application级别的配置信息.
 由于js解释器自动补全分号,return [换行] {};时,会返回undefined而不是该对象.
 调用函数时,括号和函数名不加空格; 声明函数时,函数名和参数没有空格; 其他情况左括号前均有空格.
 不要使用with语句,不要使用自加[改用a+=1],句尾不要省略分号,不要贪图简略造成难以理解代码[if(a=b)].
@@ -79,14 +92,59 @@ source maps: 记录代码压缩前后映射位置,chrome的f12开启enable JavaS
 设置最高版本IE渲染: <meta http-equiv="X-UA_Compatible" content="IE=edge"/>
 Beyond compare可以ctri + i显示差分结果汇总.
 有些模块在定义时指定了模块名,就不能在引用时指定别的名字,比如define('jQuery',[],()=>{})就被定义成了jQuery.
-underscore的延迟执行[防抖]: _.throttle在接到任务后计时15秒,到时间执行所有任务. _.debounce接到任务开始计时15秒,再接到任务会重新计时.
+underscore: _.throttle在接到任务后计时15秒,到时间执行所有任务. _.debounce接到任务开始计时15秒,再接到任务会重新计时.
 	_.throttle(func, time, {leading: false, trailing: false}) 参数是要执行的方法,延迟时间,忽略开始边界,忽略结尾边界.
 	_.debounce(func, time, flag) 参数是要执行的方法,延迟时间,flag设true会在开始边界执行而不是结束边界.
+	_.defer延迟执行方法[参数作为调用方法的参数],直到同步队列执行完毕再执行,相当于0ms的setTimeout.
+	_.invoke根据method对参数数组的元素执行方法.
 console.dir(obj)可以列出对象所有属性和方法.
 创建httpUrlConnection时,是本地向URL创建一个流. 从URL向本地为输入, 从本地向URL为输出.
 SQL插入单引号时需要把单引号换成2个单引号.
 Tomcat读取config文件,编译后存放java/jsp文件到catalina路径下.
 log4j可以用stdout重定向输出.
+location.search取得URL查询部分,即问号之后的内容.
+apply/call: 用于劫持对象的方法或者属性. 调用Func.apply(content, [args])来将content作为Func的this对象,[args][参数数组]作为Func调用的参数.
+	call和apply类似, 但是参数是参数列表而不是参数数组形式. 由于apply是列表形式的参数,可以发挥某些优势,比如: max方法的参数是列表形式,使用apply可以传入数组参数,
+	还有Array.prototype.push()也是支持列表形式不支持数组形式,使用apply可以完成数组合并.
+input的size属性可以控制输入框大小,style的width优先度比size高.
+更改IE的url可以在历史记录里添加一条内容来实现.
+状态机写法: 为对象添加状态属性,监听该属性的变化.在异步操作结束后修改状态来触发监听.
+JavaScript的异步机制: 同步任务在主线程执行,除了主线程还有一个任务队列. 在异步操作结束后在第二个队列存放一个任务,执行栈的同步任务全部执行完毕后第二队列入栈执行.
+	执行栈中同步任务总是在异步回调前执行.
+setTimeout: 接收2个参数,回调函数和等待时间[执行一次].setInterval参数相同,但是是反复执行. 注意这种方法是异步的,所以即使0ms延迟也会在同步任务之后才执行.
+undefined表示应该有值但是没有,null表示一个空值.
+js是弱类型语言[类型由变量实际值决定],虽然灵活简单,但是强类型语言可以降低系统复杂度,编译时就能发现错误. 3种强类型语言: TypeScript/FlowCheck/FlowCheck/F
+	TypeScript是微软推出的JavaScript的超集,可以编译成js执行,后缀为.ts. 采用 变量:类型 来指定类型,调用时传入参数类型和声明类型不匹配会直接报错抛出类型不匹配.
+	FlowCheck是轻量级断言库,可以在运行时检查变量类型,也是 变量:类型 来指定类型,转成js文件后会先加载断言库判断类型,不匹配报错.
+	Flow是facebook发布的类型检查工具,用来检查React远吗,使用/*@flow*/注释来表明使用Flow检查变量类型,类型不符报错并提升预期类型.Flow使用注释声明类型.
+JavaScript采用ucs-2编码方式,字符串函数无法返回正确结果[会将4个字节成拆成2个字节]. es6对字符处理做了优化: for(let a of str)可以正确识别.使用\u{xxxx}表示4字节.
+数字扩展原型: Number.prototype.add定义一个add方法来做加法,调用可以使用5['add'](6) / 5..add(6) / (5).add(6) 来区分小数点和方法.
+	由于可以为属性添加get方法,所以也可以这样扩展: Object.defineProperty(Number.prototype, 'double', function() {return this + this;}) 为数字添加double方法
+React框架起源于Facebook, 2013/5开源. 使用render方法将模板转成HTML并插入执行dom,可以混写js和html,使用组件封装代码,this.props.children执行组件所有子节点.
+	组件的propTypes属性来check属性值是否符合要求. 组件是存在内存的数据结构是虚拟dom,只有在插入文档时才会变成真实dom.
+	将组件看做状态机,getInitialState取得初始状态,setState修改状态[触发render刷新画面,state可以修改而props不可修改].
+	组件生命周期: mounting[插入dom],updating[重新渲染],unmounting[移除dom],插入和重新渲染还有will[插入前]和did[插入后].
+	注意表单是用户互动组件,不能用this.props读取,需要在change做回调取得event.target读取.
+尾调用: 函数最后一步调用其他函数[严格最后一步,不能return f()+1 和 return f;]. 由于函数调用会在内存保存调用记录来保存调用位置和变量,而尾调用只需要保留一条调用记录.
+	比如递归函数会不断调用自身,如果是尾调用形式,只需要保留一次调用记录[调用之前的操作不需要记录],避免了堆栈溢出. 使用currying[科里化]做优化,把多参数改成单参数形式.
+	es6的尾调用优化只在严格模式下开启,正常模式无效.因为正常模式函数内部的arguments和caller记录调用栈,严格模式禁用了这2个变量.
+由于promise会导致代码冗余,可以用协程[类似线程,用yield暂停].Generator是es6对协程的实现,可以交出函数执行权.
+	Generator在函数名前加*区别普通函数,调用该函数不会返回结果而是返回指针,调用指针的next方法执行yield暂停前的的语句.再调用next会执行暂停后语句.
+	next方法返回对象{value: '', done: FLAG}, value是yield表达式的值,FLAG表示执行状态.next方法可以传入参数来继续执行暂停后语句.
+	函数内部还可以使用catch捕获异常,使用throw抛出异常.
+传名和传值: 传名调用是参数表达式传入方法体,执行时求值; 传值调用是表达式求值后作为参数传入方法体.
+Thunk函数: 编译器的传名调用时替换参数的临时函数. 由于js是传值调用,Thunk不是替换表达式,而是把多参数函数替换成单参数函数[参数只是回调].用于自动执行Generator回调.
+CSS三角形: 宽高设为0,为border赋值拼三角形. 一个边框作为底边,2个边框作为斜边,剩下一个边框隐藏.
+Handerbar: 使用{{#unless @lass}}xx{{/unless}} 判断最后一行不输出xx,unless相当于不等.
+toFixed方法: 做四舍五入计算[其实是最后一位4舍6入,如果是5判断5的前一位,奇数进位偶数舍去].
+fixed/absolute布局: 没有滚动条时没有差异; fixed不会跟着滚动条滚动, 而absolute跟着滚动条滚动[即fixed是相对于浏览器,absolute是相对于可视区域].
+Array.reverse()翻转数组.
+async就是讲Generator函数的*替换成async, yield替换成await, 整体像是同步写法,自动执行器和Generator函数放在一个函数内. await后面的promise可能reject,最后放在try/catch中.
+	await命令只能在async函数中,普通函数直接报错.
+co函数库原理就是讲自动执行器包装成一个库.
+
+
+
 
 
 
