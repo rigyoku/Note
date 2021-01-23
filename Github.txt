@@ -7,3 +7,5 @@ change 里面的undo可以在本地[即没提交到github网站上]撤销提交,
 可以使用github来构建一个主页. [https://pages.github.com/] [可以选择 个人组织/项目网站 自动生成/手写]
 	需要在对应项目下新建一个分支 gh-pages, 并添加index.html文件来创建主页.
 github网页快捷键 :T 查找文件.
+Git冲突时,可以pull之后手动merge再重新提交.
+github在project创建项目后,可以创建卡片并创建issue,然后在右侧指定用户[assigned]和标签

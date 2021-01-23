@@ -1,39 +1,43 @@
-1.	修改pip来使用国内镜像:
+Python是解释型语言,面向对象,动态数据类型.不使用大括号分割代码,而是按照对齐分割.
+Python3不向下兼容.
+Python的注释可以用#实现单行注释,用 ''' ''' 或者 """ """ 实现多行注释.
+数字类型包括: int bool float complex.
+字符串可以用加号拼接,用[头:尾:步长]来截取. 用*可以重复输出字符串. 斜杠是转义字符,字符串斜杠需要前面加r.
+换行可以使用反斜杠\,多行字符串可以用3个引号或者小括号括起来.
+修改pip来使用国内镜像:
 	在C:\Users\用户名\下创建pip目录,目录下新建pip.ini文件,文件内容如下
 	[global]
 	index-url = https://mirrors.aliyun.com/pypi/simple
 	[install]
 	trusted-host=mirrors.aliyun.com
-2.	atom如果直接exe会默认安装c盘,可以下载zip文件来解压.在安装文件夹下创建.atom文件夹来更改插件安装位置.安装的包在.atom\packages目录下.注意新建文件夹之后要重新配置快捷方式.
-3.	使用编辑器安装包失败可以在atom.io搜索包名然后repo进入github去下载zip包到package下并根据package.json更名,然后进入该包执行apm install[可以先npm install来提高速度]
+atom如果直接exe会默认安装c盘,可以下载zip文件来解压.在安装文件夹下创建.atom文件夹来更改插件安装位置.安装的包在.atom\packages目录下.注意新建文件夹之后要重新配置快捷方式.
+使用编辑器安装包失败可以在atom.io搜索包名然后repo进入github去下载zip包到package下并根据package.json更名,然后进入该包执行apm install[可以先npm install来提高速度]
 	如果github速度慢可以用gitee[码云]来克隆仓库在进入文件夹来git clone下载
 	如果npm速度慢可以使用国内镜像,修改C:\Users\用户名\.npmrc ,配置[registry = https://registry.npm.taobao.org],还可以配置prefix来执行全局安装[-g]时安装的路径
-4.	atom可以在 setting -> keybindings 里面搜索并设置快捷键, 分别是 键位 / 命令 / 来源 / 选择器
-5.	pip安装的包在 Lib\site-packages 下
-6.	在github的branch搜索可以进行创建分支
-7.	使用openpyxl遍历单元格时,将会在内存直接创建,即使没有赋值.因为sheet创建在内存创建时不包含单元格,会在第一次访问时创建
+atom可以在 setting -> keybindings 里面搜索并设置快捷键, 分别是 键位 / 命令 / 来源 / 选择器
+pip安装的包在 Lib\site-packages 下
+在github的branch搜索可以进行创建分支
+使用openpyxl遍历单元格时,将会在内存直接创建,即使没有赋值.因为sheet创建在内存创建时不包含单元格,会在第一次访问时创建
 	注意sheet.cell方法的索引是从1而不是0开始的,且第三个参数存在为赋值,没有为取值[cell(row=r, column=c, value=xx)]. 也可以通过索引取值 sheet['B2'],同理sheet可以通过wb['name']取得
 	删除sheet可用 del wb[name], 保存使用 wb.save(path), 打开使用openpyxl.load_workbook(path)
-8.	whoose步骤: 创建|引入索引[为数据加入索引], 通过索引生成searcher, 创建query对象, 把query传入searcher的search方法得到result 
+whoose步骤: 创建|引入索引[为数据加入索引], 通过索引生成searcher, 创建query对象, 把query传入searcher的search方法得到result 
 	创建索引时,可以设置字段类型,如需要返回结果需要添加参数(stored=True)
-9.	mecab安装: 下载并执行mecab.exe文件[可以在github上下载(mecab本体->source),也可以在sourceforge网站下载],然后copy /sdk/libmecab.lib 到 Lib/site-packages 目录,
+mecab安装: 下载并执行mecab.exe文件[可以在github上下载(mecab本体->source),也可以在sourceforge网站下载],然后copy /sdk/libmecab.lib 到 Lib/site-packages 目录,
 	cmd执行 pip install mecab 进行安装python环境包,就可以执行python代码了.
-10.	pandas的数据类型包括 Series[一维数组] / DataFrame[二维数组], series自动生成整数索引, dataframe除了可以传递数据作为参数,还可以追加index和colums作为参数指定行列
+pandas的数据类型包括 Series[一维数组] / DataFrame[二维数组], series自动生成整数索引, dataframe除了可以传递数据作为参数,还可以追加index和colums作为参数指定行列
 	dataframe如果传入二维数组则是按行列排序,传入对象时则是列行排序[key作为列名,val作为列值]且可以自动补全.由于dataframe每列类型不同,所以耗费系统资源比numpy大.
 	numpy不复制数据,且输出不包含索引. pandas使用NaN作为缺失值,可以清楚,填充,筛选等操作. 数据压缩就是把列转成行.
 	数据量大时可以使用 numexpr 和 bottleneck 进行加速
-11.	python中list的使用会导致内存增大,最好使用iterable对象来实现,即yield写法.
-12.	github在project创建项目后,可以创建卡片并创建issue,然后在右侧指定用户[assigned]和标签
-13.	ssh命令可以链接server： ssh -p端口号 用户名@ip 然后输入密码即可
-14.	dockers可以使用命令查看版本号： cat /etc/issue centos常用命令： pwd 显示当前路径 cd 返回主目录 cd /xx进入目录 cd .. 返回上级 cd / 返回根目录 tar xzvf xx.tgz在当前目录解压文件
-15.	centos下安装python： 下载tgz文件,使用tar命令解压,执行./configure,执行make,执行make install [如果没有configure文件可以使用命令 autoreconf -i && automake && autoconf来生成]
-16.	安装pip： python setup.py install 可能缺少setuptool,_ctype,libffi,libffi-devel,zlib 根据缺失提示安装对应版本即可
-17.	python在open时除了指定路径最好指定字符集防止错误, 参数r表示读取写入时的数据,而rb表示读取二进制数据.
-18.	python使用numpy包可以实现拟合,使用matplotlib可以绘制曲线图,使用PyPDF2包读取pdf[默认解析英文,解析汉字日语需要去安装pdfminer.six][解析可用pdfminer3k]
+python中list的使用会导致内存增大,最好使用iterable对象来实现,即yield写法.
+dockers可以使用命令查看版本号： cat /etc/issue centos常用命令： pwd 显示当前路径 cd 返回主目录 cd /xx进入目录 cd .. 返回上级 cd / 返回根目录 tar xzvf xx.tgz在当前目录解压文件
+centos下安装python： 下载tgz文件,使用tar命令解压,执行./configure,执行make,执行make install [如果没有configure文件可以使用命令 autoreconf -i && automake && autoconf来生成]
+安装pip： python setup.py install 可能缺少setuptool,_ctype,libffi,libffi-devel,zlib 根据缺失提示安装对应版本即可
+python在open时除了指定路径最好指定字符集防止错误, 参数r表示读取写入时的数据,而rb表示读取二进制数据.
+python使用numpy包可以实现拟合,使用matplotlib可以绘制曲线图,使用PyPDF2包读取pdf[默认解析英文,解析汉字日语需要去安装pdfminer.six][解析可用pdfminer3k]
 	pdfminer3k使用解释器和文档获得layout对象,然后遍历来获取每个元素.
-19.	python使用raise 抛出指定异常,还以用try .. except .. else语法,else在没异常时执行
-20.	python字符串可以用startswith和endswith来判断是否以xx开始结束
-21.	pdf文件格式: 首先 [%PDF-版本号] 然后 [序号 版本号 obj xxx endobj] 各个obj可以相互引用 xref交叉引用表 trailer结构表明解析入口 startxref交叉表开始 最后%%EOF
+python使用raise 抛出指定异常,还以用try .. except .. else语法,else在没异常时执行
+python字符串可以用startswith和endswith来判断是否以xx开始结束
+pdf文件格式: 首先 [%PDF-版本号] 然后 [序号 版本号 obj xxx endobj] 各个obj可以相互引用 xref交叉引用表 trailer结构表明解析入口 startxref交叉表开始 最后%%EOF
 	入口对象为Catalog类型,包括Pages页面; 页面通过Kids属性指定了子对象; 子对象可以指定父对象,Contents,Resources以及页面大小MediaBox; 流对象可以指定压缩规则;
 	字符串用小括号括起来或者使用<>包起16进制字符串[不足2位补0] 内容除了字符串还有其他类型,以及一些操作符/指令
-22.	node调python输出乱码可以设置stdout字符集修正.
+node调python输出乱码可以设置stdout字符集修正.

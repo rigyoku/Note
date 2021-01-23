@@ -46,7 +46,7 @@ jQuery的filter可以对选择器结果进行过滤, eq可以获取选择器的�
 	insertAfter/after 插入到后面/移动到后面 appendTo/append 内部插入. empty方法清空元素, $('<p>')创建一个新元素.
 	可以为一个元素同时bind多个事件来让其执行一个回调, one监听只触发一次, unbind来解除监听.
 	jQuery自带动画函数, slideUp/slideDown 卷曲. fadeOut/fadeIn/fadeTo 淡入/淡出/调整透明度. 参数除了动画时间,还可以传入回调.
-	还可以自定义动画animate({opacity:0.5}, time, func). stop和delay可以停止/延缓动画, 设置$.fx.off为true可以关闭网页所有动画.
+	还可以自定义动画animate({opacity:0.5}, time, func). stop和delay可以停止/延缓动画, 设置$.fx.off为true可以关闭网页所有动画. $('.a').animate({height:400})使用动画改变高度.
 	id/类型选择器速度最快,其次是类选择器,伪类选择器最慢. 原生js速度更快.
 	链式写法默认缓存可以提高效率,防止选择器耗时.
 	事件存在冒泡机制, 可以在父元素监听, 顶层使用$(document).on()
@@ -55,6 +55,8 @@ jQuery的filter可以对选择器结果进行过滤, eq可以获取选择器的�
 	$.extend(flag, target, obj...)将obj等一系列对象合并到target对象上; flag默认为false, 当设置为true时,同名属性如果是对象,该对象也会合并而不是覆盖.
 	$.fn指的是jQuery命名空间,对$.fn扩展对每个jQuery都有效,等价于jQuery.prototype.
 	dom的offset().top可以取得相对屏幕偏移量.
+	定位到一个元素后,可以接着.find()查找其子元素. tr:first-child可以选中第一个tr.
+	jQuery的spinner插件用于扩展输入框,提供上下箭头.
 cookie设置httpOnly之后就不能被js读取了,有效防止XSS[恶意脚本]攻击. 设置secure将会只允许https通信. 使用JWT认证,将服务器加密后json放在请求头的Authorization放在XSRF[盗用登录信息]攻击.
 setInterval来定时循环方法, clearInterval停止该循环.
 声明后直接调用的立即执行函数,可以产生局部变量让外部无法访问,也可以保存某个参数当时的状态[防止闭包作用域无法保存多个状态的变量问题].
@@ -76,7 +78,7 @@ RequireJS不控制加载顺序,全部加载完执行回调[require([xx,xx],funci
 不要使用with语句,不要使用自加[改用a+=1],句尾不要省略分号,不要贪图简略造成难以理解代码[if(a=b)].
 变量应该放在函数头部声明. 构造函数首字母大写, 全局变量全部大写[少用全局变量].
 创建js类: 构造方法; Object.create; 对象内部方法返回一个实例[极简主义法].
-AMD规范: 异步模块定义,采用require([],func)来加载模块执行回调. CommonJS是同步加载.
+AMD规范: 异步模块定义,采用require([],func)来加载模块执行回调. CommonJS是同步加载[加载时就执行了模块,调用时取出缓存].
 	使用define([],func)定义模块, 没有依赖时可省略第一个数组参数执行写方法.
 严格模式: 消除js语法不合理/不严谨之处, 保证安全, 提高编译器效率, 为新版本js铺垫.
 	对于整个脚本而言,将use strict放在第一行时整个脚本严格模式运行; 不放在第一行按普通模式运行[注意严格和非严格的代码合并].为了合并方便,整个代码块可以放在立即执行函数中.
@@ -97,6 +99,7 @@ underscore: _.throttle在接到任务后计时15秒,到时间执行所有任务.
 	_.debounce(func, time, flag) 参数是要执行的方法,延迟时间,flag设true会在开始边界执行而不是结束边界.
 	_.defer延迟执行方法[参数作为调用方法的参数],直到同步队列执行完毕再执行,相当于0ms的setTimeout.
 	_.invoke根据method对参数数组的元素执行方法.
+	_.find(list, function)用于遍历属性,查找出方法返回true的元素.
 console.dir(obj)可以列出对象所有属性和方法.
 创建httpUrlConnection时,是本地向URL创建一个流. 从URL向本地为输入, 从本地向URL为输出.
 SQL插入单引号时需要把单引号换成2个单引号.
@@ -142,18 +145,23 @@ Array.reverse()翻转数组.
 async就是讲Generator函数的*替换成async, yield替换成await, 整体像是同步写法,自动执行器和Generator函数放在一个函数内. await后面的promise可能reject,最后放在try/catch中.
 	await命令只能在async函数中,普通函数直接报错.
 co函数库原理就是讲自动执行器包装成一个库.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+each和forEach是回调方式实现的循环,不能使用break跳出循环,可以使用return在进入操作前直接跳过.
+css的opacity可以调节透明度,0是完全透明,1是不透明.
+正则表达式判断从A到B中间包含任意字符: (?=A).[\s\S]*B . 使用.replace(/\D/g, '')可以替换所有非数字字符[\D等价于[^0-9],即非数字; /g是全局匹配].
+e.g.: 文档中表示例如, for example的缩写.
+子网掩码和IP进行and运算,可以得出所在网络是否在一个子网,不同子网需要网关转发才能通信.
+去掉IE的INPUT框的X: ::-ms-clear{display: none}
+负数的二进制表示正数补码: 高位补1
+bind('paste',func)绑定粘贴事件.
+propertychange可以解决IE9以下oninput不兼容问题.
+创建元素: html形式'<p>test</p>'; jQuery形式$('<p></p>').text('test'); dom创建document.createElement('p')
+event.stopPropagation()可以阻止事件冒泡.
+css: -webkit-appearance:none可以移除原生样式
+数组的splice(index)用于从指定位置移除后续元素.
+使用chart.js绘制多类型图形时,主类型不能是折线图. 通过hoverBackgroundColor设悬停背景色,hoverBorderColor设置悬停边框色.
+SQL: trunc(1.2345, 2)结果是1.23 保留2位,不进行四舍五入.
+Math.ceil()向上取整.
+Date.setDate()设置日期,正数代表当月,0代表上月最后一天,负数代表上个月. 通过getDay取得当前是周几,然后getDate减去周几再setDate得到当周周一.
+LZ压缩算法: 在一个区间[32kb]内搜寻重复字符,3个以上才压缩,把重复字符记录[采用2个关键字记录,距离上一个重复字符记录和多少字符重复],不重复不处理,结束后移动到重复字符的最后.
+	在文件后面补上压缩字符和原字符映射表. 关键字也能压缩,频率高的少量字节表示,频率低的大量字节表示.
+ssh命令可以链接server： ssh -p端口号 用户名@ip 然后输入密码即可
