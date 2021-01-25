@@ -34,6 +34,13 @@ python使用def来定义函数.当参数是可变类型时,函数内修改值会
 	默认变量是局部变量,想修改全局变量需要使用global声明变量为全局变量. 函数内调用globals()返回能调用的全局变量,locals()返回局部变量.
 Python的包就是一个包含__init__.py文件的文件夹.
 Python使用open去打开文件,read读取字节,write写入字节.读取会改变游标位置,通过tell获取游标位置,seek移动游标.
+os模块可以rename重命名,remove删除文件,mkdir创建文件夹,chdir修改路径,getcwd取得当前路径,rmdir删除路径.
+file: flush刷新缓冲区,将缓冲区内容写入.isatty连接到终端返回true. next返回下一行. readLine读取整行,包括换行符.
+Python也是try...catch捕获异常,还可以最后else.异常可以0个,1个或者多个.finally也是正常和异常都执行.excep除了接收异常名,还可以接收异常字符串.
+由于Python是脚本语言,没有统一的入口.通过__name__可以区分是自己执行还是被调用,自己执行name等于main,被调用name就是文件名.
+	引用包时会调用__init__文件,__all__表示包的导出模块,不写all内无法引用.
+selenium是Python的web自动化测试包.引入驱动后打开浏览器,访问url后通过选择器选中dom进行操作,也可以Xpath查找.支持等待元素加载.
+with: 调用with会先调用__enter__方法,结束[无论正常还是异常]时执行__exit__方法.
 修改pip来使用国内镜像:
 	在C:\Users\用户名\下创建pip目录,目录下新建pip.ini文件,文件内容如下
 	[global]
