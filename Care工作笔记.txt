@@ -193,3 +193,23 @@ Vue: 改变Vue.data的值,画面就会重新渲染. 自定义的组件就是一�
 	创建一个计算属性来对生成一个原数组排序后的数组来显示,不改变原数组.
 	@事件可以直接写js代码,可以写methods方法,也可以调用methods属性的方法传递参数比如$event.
 	支持修饰符比如@click.stop="Function"来阻止点击事件的冒泡,.prevent阻止画面重载,.passive立即触发事件,.once值触发一次多个修饰符可以串联[按照声明顺序执行].
+敏捷开发=迭代开发+增量开发.不断重复的进行规划/设计/编码/测试/评估,每个版本都会增加用户可以感知的完整功能.
+配色法则: 主题使用深色[c,f,6,9],浅色使用[a,b,c,d,e,f]
+	文字不要用全黑,可以使用深蓝色[1a2a3a-7a8a9a]
+	背景/阴影/边框建议灰色[aaa,bbb,ccc,ddd]
+Grid: 网格布局对比Flex[轴线布局: 只能针对轴线位置的一维布局],网格布局可以指定项目所在单元格,可以视作二维布局.
+	布局区域称为容器,子元素称为项目[项目是容器的顶层子元素,不包含项目的下层子元素].横行竖列排列.行列的交叉产生了单元格,网格线划分网格.
+	容器的属性[定义在容器上]:
+		display:grid 声明采用网格布局.默认情况下元素都是块状元素,可以改成行内元素[display:inline-grid].
+			设置成网格布局后,容器的float/inline-block/table-cell/vertical-aline/column-*都将会失效.
+		grid-template-colums:100px 100px 100px; grid-template-rows:100px 100px 100px;指定了一个3x3的网格[除了具体的像素,还可以采用百分比指定].
+			每列都指定很麻烦,可以使用repeat来重复: grid-template-columns:repeat(3, 33.3%)指定了3列,每列都是1/3的宽度[repeat(2, 10px 20px)来重复出4列].
+			在单元格大小固定而容器大小不固定时,可以auto-fill自动填充[grid-template-columns:repeat(auto-fill, 100px)来尽可能多填充100像素的子元素].
+			除了百分比和固定像素,还可以使用比例[fr[fraction缩写]]来定义大小: grid-template-columns:1fr 2fr 100px 表示最后一列固定100像素,前两列按1:2分配.
+			minmax函数可以控制一行/列的值的范围 minmax(1fr, 100px)最小比例为1,最大为100像素.
+			定义网格线除了可以指定大小,还可以通过中括号指定名称[一条线可以有多个名称]. grid-template-columns: [line1] 10px [line2 LINE2] 20px
+		
+		
+		
+		
+		
