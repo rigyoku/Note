@@ -14,3 +14,13 @@ set设置变量,例如set a = ABC赋值之后再 echo %a% 会输出ABC. set b = 
 删除文件时加/p会出现是否删除的确认内容.
 转义符号^可以把特殊字符一般化.
 逻辑运算符 & && ||. 可以用&连接多条命令,顺序全部执行. 使用&&连接时,会等待前面执行成功再执行后面,失败不再执行后续. ||连接时,前面失败才执行后面.
+IF: 可以进行字符串笔记 if </i> <not> str1 比较符号 str2 XXX  else XXX 其中/i用来设置是否区分大小写, 比较符号包括EQU/==[等于] NEQ[不等] LSS[小于] LEQ[小于等于] GTR[大于] GEQ[大于等于]
+	进行存在判断 if <not> exist 文件 XXX else XXX 多行书写时注意格式,和普通括号规则一样.
+	进行定义判断 if <not> defined 变量 XXX else XXX 判断一个变量是否存在
+	执行结果判断 if errorlevel 1 XXX else XXX 如果失败就执行XXX
+FOR: 进行循环操作, 无开关模式: for %%变量 in 集合 do XXX. %%是批处理的书写格式,dos[cmd]写作%.
+	L开关[计数循环] for /l %%变量 in (start, step, end) do XXX. 控制了循环的次数,小于等于结束值才进入循环,end小于start时可以设置step为负数.
+	F开关 for /f <"option"> %%变量 in 集合 do XXX. 操作字符串时集合为字符串,操作命令是集合为命令,访问 硬盘ascii码时集合为文件集合.
+		其中option可以是 eol=c skip=n delims=xx tokens=x,y,m-n usebackq中的一个或者多个.
+	D/R开关[遍历/递归] 操作目录或者文件 !变量是%变量的强化版, %值取出第一次赋值的值,刷新需要开启延迟开关 setlocal enabledelayedexpansion.
+处理字符串:截取字符串[变量:~起点,截取数量  意为从起点开始截取多少位][a:~-5是从后往前截取5位, a:~0,-5是从第一位截取到倒数第5位]

@@ -10,6 +10,7 @@ Marionette框架: 基于Backbone.js,Underscore的前端框架. 提供特定的vi
 	collectionView会遍历model显示,创建时可以指定childView和collection还有options参数[collection级别的变化,如add/remove/sort/reset会刷新view,model级别的变化不会刷新].
 	设置renderOrSort参数为true时,更改排序就只会调整位置而不更新dom内容. tagName是内容的父标签, className是父标签的class, 设置样式可以通过attribute来写style.
 	view通过serializeData方法将数据渲染到画面上[默认返回this.model.toJson]. 如果数据不同影响画面模板,可以重写getChildView方法对应不同数据显示不同画面.
+	onAttach方法在dom加载好之后触发一次.
 Backbone: get方法直接取数据, escape方法在取数据之前会先把数据中HTML字符转出实体形式防止XSS攻击[" => &quot;]
 	on('change')和on('change:attr')都可以监听属性变换,后者先触发. 使用unset('attr')删除属性.
 	pervious方法接收属性名作为参数,返回该属性修改前的状态.perviousAttributes()方法返回变更之前的对象,包含所有属性.[change方法中有效,因为set修改会连同上一状态一起修改]
@@ -193,6 +194,37 @@ Vue: 改变Vue.data的值,画面就会重新渲染. 自定义的组件就是一�
 	创建一个计算属性来对生成一个原数组排序后的数组来显示,不改变原数组.
 	@事件可以直接写js代码,可以写methods方法,也可以调用methods属性的方法传递参数比如$event.
 	支持修饰符比如@click.stop="Function"来阻止点击事件的冒泡,.prevent阻止画面重载,.passive立即触发事件,.once值触发一次多个修饰符可以串联[按照声明顺序执行].
+	v-model在表单上创建双向的数据绑定,v-model='msg'之后,在msg变化后{msg}的值也会变更,且改变输入内容会导致data.msg变更.注意select在ios中匹配不到v-model会变成未选中,不会选择第一个.
+		所以下拉第一项目可以设成disabled的提示项目放在用户选择.
+		默认情况每次input都会触发数据同步,设置v-model.lazy修饰符可以变成change事件同步,.number修饰符限制数字类型[因为type='number'也是字符串],.trim修饰符自动去首尾空格.
+		由于v-model默认采用value/input,不同标签可能存在异常,可以在组件中使用model属性来定义prop和event,自定义取值和自定义事件.
+	通过v-bind:test可以把值绑定到属性上,不局限于字符串类型.
+	通过Vue.component('name', {opt, val})来全局注册组件,组件是可复用的vue实例,区别只是组件没有el属性.组件复用时由于要相互独立,所以data不能是对象,需要是返回对象的方法.
+		通过prop可以实现向组件传值,组件内部声明好之后在引用时:pro来绑定. 组件只能有一个根元素.
+		父组件可以监听子组件事件,子组件使用$emit来触发到父组件[可以传参数,比如@click='$emit('NAME', a)',父组件用$event接收;父组件用方法接收那第一参数就是传入的值].
+	自定义组件也可以用v-model,例如自定义的input,使用v-model相当于绑定了value和input事件,需要在input事件抛出value值.
+	slot插槽: 组件的模板使用<slot></slot>标签,调用组件标签时,写在标签中的值会插入到插槽内.
+		插槽内容可以是html,也可以是其他组件.如果组件没有slot元素,那么组件标签内的内容会被抛弃. 插槽内容可以和访问到和模板一样的属性,不能访问子组件特性.因为子模板内容在子作用域编译.
+		插槽可以设置默认内容,不设置值时采用默认内容,设置了就显示设置内容.
+		组件内设置多个插槽时需要指定名字变成具名插槽[name='xx'].赋值使用template标签v-solt:name指定哪个插槽[可以动态指定v-solt:[name]或者#[name]],或者直接将name作为标签也可以指定.
+		作用域插槽: 让插槽访问子组件内容.本质是提供一个方法接收v-solt绑定的参数给插槽访问. 可以使用template+#name的具名插槽为多个插槽分别赋值来访问.
+	component标签的:is属性可以设置加载哪个组件,实现动态组件功能.
+	因为部分html的标签对内容有限制,比如table和ul等,在内部使用自定义组件会导致被解析到标签外部.可以使用is='组件'来声明组件.
+		如果使用单文件组件.vue文件,或者template: 'xx'字符串形式,或者使用script标签设置type为text/x-template也没问题.
+	定义组件名时,可以使用横线分割,也可以用驼峰式命名.但是非字符串模板只能使用横线式[html大小写不敏感,浏览器将大写转成小写,prop同理].
+	使用component全局注册的组件任意实例均可使用,而局部注册的组件虽然能够减少下载量,但是只有当前组件可以使用,子组件不可用.
+		使用components属性局部注册. 使用模块系统时,组件都放在components目录下. 如果大量使用基础局部组件,可以在入口处注册成全局的.
+	prop可以在声明时指定数据类型[除了基础型也可以自定义]和是否必须,指定默认值和验证方式[实例化之前验证,实例属性不可用].使用v-bind传入时不写参数就会把对象所有属性都传入.
+		数据绑定在prop是单向向下的,父组件更新会影响子组件.所以子组件不应改变prop的值,需要变更可以放在计算属性,需要初始值可以放在data.
+		注意通过prop传递对象时也是传递指针,所以子组件变更时父组件也能感知.
+	如果属性没通过prop显示声明,可以写在组件的根实例上,会生成到根元素上.
+	大多数特性会被外部设置的值替换掉,class和style特殊会进行合并. 如果不希望继承特性,可以设置inheritAttrs: false 禁用继承不会影响class和style.
+		$attrs包含了父作用域不作为prop的特性,不包括class和style.通过v-bind="$attrs"传到子组件.
+		通过禁用继承和$attrs传递可以控制特性的分发.
+	事件名不同于组件和prop,不存在大小写转换.但是事件在dom模板监听还是会转成小写,最好用横线形式,保证事件名完全匹配.
+	使用v-on:Name.native可以监听原生事件,也可以v-on="$listeners"来设置监听. $listeners是该组件所有的监听.
+	有时需要父子组件双向传值,使用子组件$emit之后父组件使用.sync修饰符的属性来接收该属性的update事件并改变属性,本质是语法糖. .sync修饰的v-bind不能接表达式.
+	keep-alive解决了动态组件切换时渲染性能问题,第一次被创建好之后被缓存下来. 将动态组件用keep-alive标签包裹即可,但是要求组件有自己的名字.
 敏捷开发=迭代开发+增量开发.不断重复的进行规划/设计/编码/测试/评估,每个版本都会增加用户可以感知的完整功能.
 配色法则: 主题使用深色[c,f,6,9],浅色使用[a,b,c,d,e,f]
 	文字不要用全黑,可以使用深蓝色[1a2a3a-7a8a9a]
@@ -223,7 +255,11 @@ Grid: 网格布局对比Flex[轴线布局: 只能针对轴线位置的一维布�
 		grid-column/row: 表示grid-column/row-start/end的缩写. 用分数形式表示,如1/3表示1列开始3列结束. 省略值表示使用相同值.
 		grid-area: 指定项目放在哪个区域[grid-template-areas划分的区域]. 还可以当做grid-column/row的缩写,用 1/3/2/4形式表示为位置.
 异步操作时,画面要加等待效果防止连续操作.
-
+监听事件不需要时记得销毁
+d3.js: Data-Driver Documents 数据驱动文档,做可视化的js库  .
+IE下的box-shadow单独使用不好用,需要配合border-collapse: separate设置边框为默认才行.
+开发流程: 项目启动/需求分析/设计/开发/测试/上线. 启动: 人员分配,明确制度; 需求分析: 产品经理提供产品的原型,包含业务流程和页面跳转;
+	设计: ui设计,概要设计,表机构设计,通讯规则; 开发: 编写代码,确认需求,多客户端联调,功能评审; 测试: 测试Case,压力测试,操作文档.
 
 
 
