@@ -11,6 +11,7 @@ Marionette框架: 基于Backbone.js,Underscore的前端框架. 提供特定的vi
 	设置renderOrSort参数为true时,更改排序就只会调整位置而不更新dom内容. tagName是内容的父标签, className是父标签的class, 设置样式可以通过attribute来写style.
 	view通过serializeData方法将数据渲染到画面上[默认返回this.model.toJson]. 如果数据不同影响画面模板,可以重写getChildView方法对应不同数据显示不同画面.
 	onAttach方法在dom加载好之后触发一次.
+	$el.children为在当前元素下查找子元素.
 Backbone: get方法直接取数据, escape方法在取数据之前会先把数据中HTML字符转出实体形式防止XSS攻击[" => &quot;]
 	on('change')和on('change:attr')都可以监听属性变换,后者先触发. 使用unset('attr')删除属性.
 	pervious方法接收属性名作为参数,返回该属性修改前的状态.perviousAttributes()方法返回变更之前的对象,包含所有属性.[change方法中有效,因为set修改会连同上一状态一起修改]
@@ -27,6 +28,7 @@ Backbone: get方法直接取数据, escape方法在取数据之前会先把数�
 	collectionView的filter可以过滤model,返回true的才显示. region.currentView指向该区域显示的view.
 	Radio.channel.trigger去触发一个没注册的监听,不会报错.
 	layoutview有region属性,compositeview有childRegion属性.
+	compositeview的emptyView属性是集合为空是显示的view.
 eclipse保存卡顿可以把自动build关了. 复制卡顿可以把.project文件倒数2行的check删了.
 由于this指向调用方法的对象,模块的方法内this指向不是原对象,可以先保存this再后续使用[例如self=this].
 js闭包: 在全局调用局部变量[方法内一个方法调用了内部变量,最后返回了该方法.[注意let/const的块级作用域和var区别]],让局部变量不被垃圾回收机制回收掉.
@@ -60,6 +62,8 @@ jQuery的filter可以对选择器结果进行过滤, eq可以获取选择器的�
 	dom的offset().top可以取得相对屏幕偏移量.
 	定位到一个元素后,可以接着.find()查找其子元素. tr:first-child可以选中第一个tr.
 	jQuery的spinner插件用于扩展输入框,提供上下箭头.
+	text方法取值会将html字符转义,比如将&nbsp;转成空格.
+	toggle(speed, callback, switch)切换元素可见状态,参数分别是切换速度,切换回调,显示/隐藏元素.
 cookie设置httpOnly之后就不能被js读取了,有效防止XSS[恶意脚本]攻击. 设置secure将会只允许https通信. 使用JWT认证,将服务器加密后json放在请求头的Authorization放在XSRF[盗用登录信息]攻击.
 setInterval来定时循环方法, clearInterval停止该循环.
 声明后直接调用的立即执行函数,可以产生局部变量让外部无法访问,也可以保存某个参数当时的状态[防止闭包作用域无法保存多个状态的变量问题,因为绑定到参数的变量值不会变].
@@ -142,6 +146,7 @@ React框架起源于Facebook, 2013/5开源. 使用render方法将模板转成HTM
 Thunk函数: 编译器的传名调用时替换参数的临时函数. 由于js是传值调用,Thunk不是替换表达式,而是把多参数函数替换成单参数函数[参数只是回调].用于自动执行Generator回调.
 CSS三角形: 宽高设为0,为border赋值拼三角形. 一个边框作为底边,2个边框作为斜边,剩下一个边框隐藏.
 Handerbar: 使用{{#unless @lass}}xx{{/unless}} 判断最后一行不输出xx,unless相当于不等.
+	#with 将对象的属性向下层传递.
 toFixed方法: 做四舍五入计算[其实是最后一位4舍6入,如果是5判断5的前一位,奇数进位偶数舍去].
 fixed/absolute布局: 没有滚动条时没有差异; fixed不会跟着滚动条滚动, 而absolute跟着滚动条滚动[即fixed是相对于浏览器,absolute是相对于可视区域].
 Array.reverse()翻转数组.
@@ -225,11 +230,13 @@ Vue: 改变Vue.data的值,画面就会重新渲染. 自定义的组件就是一�
 	使用v-on:Name.native可以监听原生事件,也可以v-on="$listeners"来设置监听. $listeners是该组件所有的监听.
 	有时需要父子组件双向传值,使用子组件$emit之后父组件使用.sync修饰符的属性来接收该属性的update事件并改变属性,本质是语法糖. .sync修饰的v-bind不能接表达式.
 	keep-alive解决了动态组件切换时渲染性能问题,第一次被创建好之后被缓存下来. 将动态组件用keep-alive标签包裹即可,但是要求组件有自己的名字.
+	使用工厂函数定义异步组件,resolve返回组件定义,也可以reject拒绝.
+	不要手动操作dom或者另一个组件实例的内部.
 敏捷开发=迭代开发+增量开发.不断重复的进行规划/设计/编码/测试/评估,每个版本都会增加用户可以感知的完整功能.
 配色法则: 主题使用深色[c,f,6,9],浅色使用[a,b,c,d,e,f]
 	文字不要用全黑,可以使用深蓝色[1a2a3a-7a8a9a]
 	背景/阴影/边框建议灰色[aaa,bbb,ccc,ddd]
-Grid: 网格布局对比Flex[轴线布局: 只能针对轴线位置的一维布局],网格布局可以指定项目所在单元格,可以视作二维布局.
+Grid: 网格布局对比Flex[弹性布局: 只能针对轴线位置的一维布局],网格布局可以指定项目所在单元格,可以视作二维布局.
 	布局区域称为容器,子元素称为项目[项目是容器的顶层子元素,不包含项目的下层子元素].横行竖列排列.行列的交叉产生了单元格,网格线划分网格.
 	容器的属性[定义在容器上]:
 		display:grid 声明采用网格布局.默认情况下元素都是块状元素,可以改成行内元素[display:inline-grid].
@@ -260,14 +267,21 @@ d3.js: Data-Driver Documents 数据驱动文档,做可视化的js库  .
 IE下的box-shadow单独使用不好用,需要配合border-collapse: separate设置边框为默认才行.
 开发流程: 项目启动/需求分析/设计/开发/测试/上线. 启动: 人员分配,明确制度; 需求分析: 产品经理提供产品的原型,包含业务流程和页面跳转;
 	设计: ui设计,概要设计,表机构设计,通讯规则; 开发: 编写代码,确认需求,多客户端联调,功能评审; 测试: 测试Case,压力测试,操作文档.
-
-
-
-
-
-
-
-
+观察者模式: 多个观察者监听同一个主题,主题改变时所有观察者都会收到通知.publish触发事件, subscribe监听事件.
+referer: 客户端发送请求时的可选字段,内容是引荐网页的url[正确写法是referrer,但是写入标准时写错了].
+	点击link/发送表单/网页加载静态资源[js/css/image] 会把当前url传入referer. 可以通过document.referrer取得当前的referer来限制请求源.
+	通过重定向而不是直接跳转可以隐藏referer. 设置rel='noreferrer'之后点击标签不会携带refer信息. 设置refer内容可以通过referrerpolicy控制.
+img标签的srcset: 指定多张图片,使用 urlA 8w, url2 1x格式, 用来使用像素密度[x]或者宽度[w]区分图片显示. sizes属性必须配合srcset才有效.
+	sizes属性可以设置媒表达式 (max-width: 100px) 80px 表示宽度小于100时该标签宽度80.
+	picture标签是容器标签,内部包含source标签和默认的img标签,不支持picture就采用img.其中source标签配置srcset和media[max-width格式].
+nginx的配置中,使用location进行匹配url,类似路由机制,多条匹配时会进入第一条.使用root时会将路径拼到匹配项目之前,alias会对匹配项目进行替换.
+web中创建FileReader实例之后注册onLoad回调,调用readAsText可以读取文件.
+Flex: 弹性布局, 设置Flex后,子元素float/clear/veritcal-align会失效. 设置flex布局的元素称为容器,子元素称为项目.容器存在2根轴: 水平主轴和垂直交叉轴. 
+	主轴和起点交叉叫做main start,和终点交叉叫做main end. 交叉轴和起点交叉叫做cross start,和终点交叉叫做cross end.项目默认沿主轴排列,项目占轴线空间叫做main size/cross size.
+	容器属性: flex-direction[主轴方向]/flex-wrap[换行方式]/flex-flow[方向和换行的缩写]/
+		justify-content[项目在主轴上对齐方式]/align-items[项目在交叉轴对齐方式]/align-content[多轴线时,轴线间排列对齐方式]
+	项目属性: order[排序索引,小的在前]/flex-grow[放大比例]/flex-shrink[缩小比例]/flex-basis[计算剩余空间做缩放前,该项目固定大小]/
+		flex[前3者缩写]/align-self[该项目排列,可覆盖align-item]. [注意: 放大缩小如果设置0表示不缩放,正数代表缩放比例,负数无效.]
 
 
 
