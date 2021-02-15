@@ -107,3 +107,5 @@ Python插件安装:
 		tar xzvf openpyxl-3.0.4.tar.gz
 		cd ./openpyxl-3.0.4
 		python3 setup.py install
+
+----------------------------------------------------------------------------

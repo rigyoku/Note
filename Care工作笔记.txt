@@ -29,6 +29,7 @@ Backbone: get方法直接取数据, escape方法在取数据之前会先把数�
 	Radio.channel.trigger去触发一个没注册的监听,不会报错.
 	layoutview有region属性,compositeview有childRegion属性.
 	compositeview的emptyView属性是集合为空是显示的view.
+	destory之后的方法不会执行,相当于return.
 eclipse保存卡顿可以把自动build关了. 复制卡顿可以把.project文件倒数2行的check删了.
 由于this指向调用方法的对象,模块的方法内this指向不是原对象,可以先保存this再后续使用[例如self=this].
 js闭包: 在全局调用局部变量[方法内一个方法调用了内部变量,最后返回了该方法.[注意let/const的块级作用域和var区别]],让局部变量不被垃圾回收机制回收掉.
@@ -52,7 +53,7 @@ jQuery的filter可以对选择器结果进行过滤, eq可以获取选择器的�
 	可以为一个元素同时bind多个事件来让其执行一个回调, one监听只触发一次, unbind来解除监听.
 	jQuery自带动画函数, slideUp/slideDown 卷曲. fadeOut/fadeIn/fadeTo 淡入/淡出/调整透明度. 参数除了动画时间,还可以传入回调.
 	还可以自定义动画animate({opacity:0.5}, time, func). stop和delay可以停止/延缓动画, 设置$.fx.off为true可以关闭网页所有动画. $('.a').animate({height:400})使用动画改变高度.
-	id/类型选择器速度最快,其次是类选择器,伪类选择器最慢. 原生js速度更快.
+	id/类型选择器速度最快,其次是类选择器,伪类选择器最慢. 原生js速度更快[多条件的选择器直接并列写即可,而'或'选择器用逗号分隔].
 	链式写法默认缓存可以提高效率,防止选择器耗时.
 	事件存在冒泡机制, 可以在父元素监听, 顶层使用$(document).on()
 	修改dom开销很大,应该整齐插入而不是一条条插入. 大量处理时,应该使用detach[移除元素并保留副本,用于再插入]取出dom操作完再插入.
@@ -64,6 +65,7 @@ jQuery的filter可以对选择器结果进行过滤, eq可以获取选择器的�
 	jQuery的spinner插件用于扩展输入框,提供上下箭头.
 	text方法取值会将html字符转义,比如将&nbsp;转成空格.
 	toggle(speed, callback, switch)切换元素可见状态,参数分别是切换速度,切换回调,显示/隐藏元素.
+	通配符选择器: $('[xx$=ab]') 选择xx属性以ab结尾的选择器. $('[xx^=ab]') 选择xx属性以ab开头的选择器.
 cookie设置httpOnly之后就不能被js读取了,有效防止XSS[恶意脚本]攻击. 设置secure将会只允许https通信. 使用JWT认证,将服务器加密后json放在请求头的Authorization放在XSRF[盗用登录信息]攻击.
 setInterval来定时循环方法, clearInterval停止该循环.
 声明后直接调用的立即执行函数,可以产生局部变量让外部无法访问,也可以保存某个参数当时的状态[防止闭包作用域无法保存多个状态的变量问题,因为绑定到参数的变量值不会变].
@@ -107,6 +109,7 @@ underscore: _.throttle在接到任务后计时15秒,到时间执行所有任务.
 	_.defer延迟执行方法[参数作为调用方法的参数],直到同步队列执行完毕再执行,相当于0ms的setTimeout.
 	_.invoke根据method对参数数组的元素执行方法.
 	_.find(list, function)用于遍历属性,查找出方法返回true的元素.
+	_.each在遍历过程中改变数组不会影响遍历,而数组本身的forEach方法遍历时更改数组会影响遍历.
 console.dir(obj)可以列出对象所有属性和方法.
 创建httpUrlConnection时,是本地向URL创建一个流. 从URL向本地为输入, 从本地向URL为输出.
 SQL插入单引号时需要把单引号换成2个单引号.
@@ -165,7 +168,7 @@ propertychange可以解决IE9以下oninput不兼容问题.
 创建元素: html形式'<p>test</p>'; jQuery形式$('<p></p>').text('test'); dom创建document.createElement('p')
 event.stopPropagation()可以阻止事件冒泡.
 css: -webkit-appearance:none可以移除原生样式
-数组的splice(index)用于从指定位置移除后续元素.
+数组的splice(start, num, new)用于从start位置开始删除num个元素,并添加new作为新元素在该位置.
 使用chart.js绘制多类型图形时,主类型不能是折线图. 通过hoverBackgroundColor设悬停背景色,hoverBorderColor设置悬停边框色.
 SQL: trunc(1.2345, 2)结果是1.23 保留2位,不进行四舍五入.
 Math.ceil()向上取整.
@@ -282,6 +285,43 @@ Flex: 弹性布局, 设置Flex后,子元素float/clear/veritcal-align会失效. 
 		justify-content[项目在主轴上对齐方式]/align-items[项目在交叉轴对齐方式]/align-content[多轴线时,轴线间排列对齐方式]
 	项目属性: order[排序索引,小的在前]/flex-grow[放大比例]/flex-shrink[缩小比例]/flex-basis[计算剩余空间做缩放前,该项目固定大小]/
 		flex[前3者缩写]/align-self[该项目排列,可覆盖align-item]. [注意: 放大缩小如果设置0表示不缩放,正数代表缩放比例,负数无效.]
+socket中on的监听对应emit的触发.
+默认position布局是static,浏览器决定位置. relative相对布局,相对于static进行便宜.absolute绝对布局,相对于父节点偏移.fixed是相对于可视窗口偏移.
+	2017年浏览器新增sticky动态固定效果,只能写在th上,tr/thead都没该属性,使用时配合top属性定位位置.
+手机App分为3大类: 原生/web/混合. H5是混合的前端部分,混合app通过API Bridge调用容器底层接口.
+铺满高度首先html和body要铺满.
+MongoDB: 创建用户时,先use admin使用管理员数据库,然后db.createUser({user: 'root', pwd: 'pass', roles: ['root']})添加用户并赋予权限[userAdminAnyDatebase[管理用户]/read/readWrite/root].
+	use dbName切换使用的数据库[不存在就创建]. mongod -dbpath PATH切换数据存放路径[只能在根目录下data文件夹]. db查看当前数据库名. show dbs显示所有数据库.
+	db.createCollection创建集合[集合和表的概念类似]. db.NAME.insert(OBJ)向集合插入数据. show collections/tables显示集合.
+	启动服务时,使用mongod -auth来开启验证,如果是默认启动的服务,可以修改bin下面的mongod.cfg文件,在security下添加authorization: enabled开启认证.
+	db.shutdownServer()可以停止服务. db.dropDatabase()删除数据库. db.col.drop()删除表. db.changeUserPassword(USER, PASS)修改用户密码.
+	控制台通过mongo IP连接指定地址.
+非管理员用户添加启动服务: 先在注册表找到当前用户id, 控制台使用sc sdshow取得当前全县,再使用sc sdset在之前结果后添加查询到的用户id.
+js的方法本质也是对象[非基本型都是对象],可以使用FUNC.NAME形式扩展. 对象就是属性的集合. 对象都是方法创建的[直接{}是语法糖].
+	方法的原型也是对象.原型有默认方法construct构造方法,指向了本身. 使用方法创建的对象都可以调用构造方法的原型,实例隐式原型__proto__等于构造方法的原型,即所有对象都有隐式原型.
+	方法的原型也是对象,所以该原型的隐式原型是Object,而Object的隐式原型是null.
+	使用instanceof判断是不是同一类型,就是使用了实例的隐式原型和类型的原型向上查找,重合就返回true.
+	访问对象属性时,先查找本身属性,没有再去查找原型属性.通过hasOwnProperty可以判断属性是否是自身的.
+函数创建时决定了变量的取值作用域.函数和this会提前声明并赋值. 函数中的this只有在被调用时才能确定. 构造函数的this指向要new的对象. 作为属性被调用时,指向调用者.
+	浏览器中全局环境的this指向window. 上下文环境只能有一个,环境栈默认是全局环境. 指向函数时将函数上下文入栈,执行完毕退栈,栈中就又只剩下全局环境了.
+Java使用poi可以读取Excel. 通过HSSFWorkbook/XSSFWorkbook获取文档,再获取sheet/row/cell数据即可. row.getFirstCellNum是从0开始,row.getLastCellNum取得最后一列是null对象.
+	getRowIndex/getRowNum也都是从0开始. 合并单元格后数据归属于第一行单元格.
+PDF文件的CIDsystemInfo声明了映射集.
+与运算符优先度高于或运算符,即先执行&&,再执行||.
+配置对象的属性时, set/get和value不可并存. 如果是不可写/不可配置的属性,针对该属性的赋值/删除/重新配置操作均会报错.
+	如果可写但是不可配置,赋值和重新定义没问题,但是不能从value修改到set/get形式.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

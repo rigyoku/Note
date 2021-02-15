@@ -1,3 +1,4 @@
+git是版本控制工具,而github的代码托管平台.
 点击对应仓库的setting 在最下方的Danger Zone可以删除 删除需要填写 用户名/项目名.
 除了可以选择文件来提交,具体每行文件也可以控制提交. 蓝色表示选中状态用来提交,绿色表示未选中.
 change 里面的undo可以在本地[即没提交到github网站上]撤销提交,对应的历史也会消失.
@@ -9,3 +10,18 @@ change 里面的undo可以在本地[即没提交到github网站上]撤销提交,
 github网页快捷键 :T 查找文件.
 Git冲突时,可以pull之后手动merge再重新提交.
 github在project创建项目后,可以创建卡片并创建issue,然后在右侧指定用户[assigned]和标签
+配置git账户: git config --global user.name "NAME"配置用户名, git config --global user.email "MAIL"配置邮箱
+进入文件夹后,git init创建.git文件,即创建git仓库.
+设置.gitignore来忽略某些文件的提交. 使用#做注释, ?表示匹配一个任意字符, [xx]表示匹配括号内字符串, *表示任意个任意字符.
+.gitkeep来保持一个空的文件夹结构.
+使用git add XX添加要提交的文件[可以git add . 来全部添加],git commit -m XX添加注释并进行提交操作.
+git remote -v可以查看远程仓库. git branch -v查看当前分支[-vv查看上游分支]. git checkout xx切换到xx分支. git pull更新代码
+
+
+
+
+
+
+
+
+

@@ -30,16 +30,20 @@ python使用def来定义函数.当参数是可变类型时,函数内修改值会
 	调用时如果使用了形参的关键字做匹配则可以不按顺序传值. 声明函数时还可以设默认值,不传值就使用默认值.
 	当参数长度不固定时,使用*param表示元组形式参数,使用**param表示字典形式参数. 参数列表出现单独*时,后续参数必须使用关键字传值.
 	匿名函数使用lambda来声明,匿名函数不能访问参数列表外的变量.
-	不写return就是返回None.
+	不写return就是返回None. 类的方法第一个参数需要是self.
 	默认变量是局部变量,想修改全局变量需要使用global声明变量为全局变量. 函数内调用globals()返回能调用的全局变量,locals()返回局部变量.
 Python的包就是一个包含__init__.py文件的文件夹.
 Python使用open去打开文件,read读取字节,write写入字节.读取会改变游标位置,通过tell获取游标位置,seek移动游标.
-os模块可以rename重命名,remove删除文件,mkdir创建文件夹,chdir修改路径,getcwd取得当前路径,rmdir删除路径.
+os模块可以rename重命名,remove删除文件,mkdir创建文件夹,chdir修改路径,getcwd取得当前路径,rmdir删除路径,listdir取得当前目录下所有文件和文件夹,os.path.join拼接目录和文件[夹].
+	mkdir的参数: ./xx是创建到当前目录, xx是创建到当前目录, /xx是创建到当前盘符根目录
 file: flush刷新缓冲区,将缓冲区内容写入.isatty连接到终端返回true. next返回下一行. readLine读取整行,包括换行符.
 Python也是try...catch捕获异常,还可以最后else.异常可以0个,1个或者多个.finally也是正常和异常都执行.excep除了接收异常名,还可以接收异常字符串.
 由于Python是脚本语言,没有统一的入口.通过__name__可以区分是自己执行还是被调用,自己执行name等于main,被调用name就是文件名.
 	引用包时会调用__init__文件,__all__表示包的导出模块,不写all内无法引用.
 selenium是Python的web自动化测试包.引入驱动后打开浏览器,访问url后通过选择器选中dom进行操作,也可以Xpath查找.支持等待元素加载.
+	等待分为: 强制等待time.sleep(n) / 隐式等待impicitly.wait(n)[一次设置,全局有效]/ 显式等待WebDriverWait().until[设置显式优先度会高于隐式]
+	webdriver自带截图方法:  get screenshot as file(path) / save screenshot(path) 来保存截图到目录下.
+	find_element_by_xpath可以根据xpath查找元素. 使用xpath可以绝对定位,也可以根据id/name等选择, //是任意子节点, /是下一层子节点.
 with: 调用with会先调用__enter__方法,结束[无论正常还是异常]时执行__exit__方法.
 修改pip来使用国内镜像:
 	在C:\Users\用户名\下创建pip目录,目录下新建pip.ini文件,文件内容如下
@@ -78,3 +82,18 @@ pdf文件格式: 首先 [%PDF-版本号] 然后 [序号 版本号 obj xxx endobj
 	入口对象为Catalog类型,包括Pages页面; 页面通过Kids属性指定了子对象; 子对象可以指定父对象,Contents,Resources以及页面大小MediaBox; 流对象可以指定压缩规则;
 	字符串用小括号括起来或者使用<>包起16进制字符串[不足2位补0] 内容除了字符串还有其他类型,以及一些操作符/指令
 node调python输出乱码可以设置stdout字符集修正.
+python的async模块用于执行异步操作.python本身是同步的,因为可以多线程,实现异步和js写法一致,都是async和await,调用使用asyncio.run().可以操作无头浏览器pyppetter实现自动化.
+使用post请求时,需要在requests的data后配置对应的请求头指定类型.
+字符串转比特使用encode,比特转字符串使用decode.
+re.sub(匹配正则, 匹配项要替换的目标字符串, 原字符串)来进行正则替换,注意替换后的返回值是结果,而原字符串不变.
+embed版本的python是免安装直接运行的,按照pip需要把setuptool放在embed文件夹下. 启动pip需要配置路径Lib/site-package到python3x._pth文件中.
+python解析xml文件推荐使用cElementTree包,提供了iter遍历器,接收tag参数来过滤, 使用iterfind/findall可以根据xpath进行筛选.
+	tag: 节点名称. text: ele的内容. attrib: 附有属性. tail: 闭合之后的内容.
+
+
+
+
+
+
+
+

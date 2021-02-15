@@ -24,3 +24,21 @@ FOR: 进行循环操作, 无开关模式: for %%变量 in 集合 do XXX. %%是�
 		其中option可以是 eol=c skip=n delims=xx tokens=x,y,m-n usebackq中的一个或者多个.
 	D/R开关[遍历/递归] 操作目录或者文件 !变量是%变量的强化版, %值取出第一次赋值的值,刷新需要开启延迟开关 setlocal enabledelayedexpansion.
 处理字符串:截取字符串[变量:~起点,截取数量  意为从起点开始截取多少位][a:~-5是从后往前截取5位, a:~0,-5是从第一位截取到倒数第5位]
+CMD的清空使用cls命令.
+ssh连接服务器: ssh -p端口号 用户名@ip 就可以在cmd连接服务器.
+Centos: cat /etc/issue取得系统版本. pwd显示当前路径. cd返回用户主目录. cd /xx进入路径. cd ..返回上一级. cd /返回根路径. tar xzvf xx.tgz在当前目录解压文件.
+	安装软件: 下载tgz文件,解压后进入文件夹,执行./configure && make && make install[缺少configure可以先执行 autoreconf -i && automake && autoconf].
+	使用rpm安装软件: rpm -ivh xx.rpm[如果是更新可以把i换成U],多包互相依赖可以一个命令同时安装. 添加--replacefiles参数可以替换冲突的文件. --oldpackage降低版本.
+	更新openssl可以先备份原有配置并设置软连接.
+	rpm -q xx查询安装状况, rpm -e xx卸载软件.
+	权限不足[permission denied]时,可以切换到root用户[sudo -i],然后ls -l 文件名 查看权限, chmod 777 文件名 添加权限.
+	/usr/bin/pkg-config --cflags 包名 来检查包是否安装. 如果一个包已经安装但是在pkg-config查不到,可以把.pc文件复制到/usr/lib64/pkgconfig/ 目录下
+linux使用rm -r xx删除目录,每个项目都会确认是否删除. rm -rf xx删除目录会直接删除不做确认. cp a/b/* c/d/ 会将b目录下所有文件复制到d目录下.
+	nproc获取核心数量
+	nohup XXXX [args] [&] 可以将命令在后台执行, &参数可以在退出终端时仍然执行该命令不退出.
+	jobs查看当前执行命令,终端退出后查不到之前后台挂起的命令. 使用ps -x可以不区分终端来显示所有程序,然后kill %job 或者 kill pid来停止程序.
+	
+	
+	
+	
+	

@@ -6,3 +6,6 @@ Node的require加载模块逻辑: 内部模块直接返回; 模块./或者/或�
 	require还提供了resolve方法供外部调用,根据模块名返回绝对路径. 模块加载的实质是诸如exports,require,module3个全局变量,执行模块代码,将exports变量输出.
 每个module都有require方法,调用内部的module._lead方法加载. 先计算绝对路径,有缓存就用缓存,判断是否为内部模块,生成实例存入缓存.调用实例load方法加载模块,输出暴露的exports属性.
 require(mysql)引入mysql模块后,调用createPool传入ip/user/password创建连接池,调用getConnection进行连接,最后调用query执行sql,最后需要释放连接.
+apm是atom的包管理工具,类似于npm.
+npm可以使用npmrc文件指定镜像文件作为数据源[registry],指定prefix为包安装的路径.
+es6模块以.mjs结尾, commonjs模块以.cjs结尾. .js结尾的文件根据package.json中的type字段决定加载方式.
