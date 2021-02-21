@@ -310,8 +310,14 @@ PDF文件的CIDsystemInfo声明了映射集.
 与运算符优先度高于或运算符,即先执行&&,再执行||.
 配置对象的属性时, set/get和value不可并存. 如果是不可写/不可配置的属性,针对该属性的赋值/删除/重新配置操作均会报错.
 	如果可写但是不可配置,赋值和重新定义没问题,但是不能从value修改到set/get形式.
-
-
+shift + tab 可以前移.
+Redis: 启动服务: 进入解压文件夹后, 命令行执行 redis-server.exe redis.windows.conf 注意该窗口不能关闭.
+	连接服务: redis-cli.exe -h 127.0.0.1 -p 6379
+	配置: dir存放路径 masterauth master设置密码的连接密码 requirepass连接密码 slaveof从属服务,启动redis从master更新数据 dbfilename数据库文件名[默认dump.rdb]\
+	数据类型:string[单个键值对]/ hash[对象,键值对集合]/ list[数组]/ set[集合,唯一性]/ zset[有序集合,从小到大]
+	操作: string操作: set key vaule赋值. get key取值. 在赋值时,相同的key会后者覆盖前者[key类型需要一样]. del key删除. hash操作: hmset/hget来赋值和取值.
+		list操作: lpush/lrange来赋值和取值. set操作: sadd/smenbers来赋值和取值. zset操作: zadd/zrangebyscore取值[zset虽然值不能重复,但是排序的score可以重复].
+vscode的插件安装到c盘用户下的.vscode文件夹.
 
 
 

@@ -7,5 +7,109 @@ Node的require加载模块逻辑: 内部模块直接返回; 模块./或者/或�
 每个module都有require方法,调用内部的module._lead方法加载. 先计算绝对路径,有缓存就用缓存,判断是否为内部模块,生成实例存入缓存.调用实例load方法加载模块,输出暴露的exports属性.
 require(mysql)引入mysql模块后,调用createPool传入ip/user/password创建连接池,调用getConnection进行连接,最后调用query执行sql,最后需要释放连接.
 apm是atom的包管理工具,类似于npm.
-npm可以使用npmrc文件指定镜像文件作为数据源[registry],指定prefix为包安装的路径.
+配置node: npm config get userconfig取得当前用户配置. npm config get globalconfig查看全局配置文件.
+	npm可以使用npmrc文件指定镜像文件作为数据源[registry],指定prefix为包安装的路径[该路径下创建node_modules文件夹],proxy设置代理的url,strict-ssl不允许转发.
+	npm config set TEST test可以修改当前用户配置, npm config set TEST test -g修改全局的配置.
 es6模块以.mjs结尾, commonjs模块以.cjs结尾. .js结尾的文件根据package.json中的type字段决定加载方式.
+PM2是node进程管理工具,可以使用pm2 start xx --watch 启动带监视的服务,在代码变更时重启服务.内置了负载均衡,保证服务一直在线,0秒reload.instances为使用的核心数.
+	nodemon也可以保证代码修改后重启服务,但是关闭命令行会停止服务,而PM2可以后台运行.
+package.json: script脚本; dependencies运行依赖模块; devDependencies开发依赖模块[直接指定版本号为固定版本/使用~版本只有最后一位可以提高/使用^为后2位都可以提高/latest使用最新版];
+	bin将文件路径配置到module/bin目录下,该目录在系统环境变量,所以执行可以省略路径直接使用; main指定了程序加载的入口; engines指定了模块运行平台,可以指定npm/node的版本号;
+	bundledDependencies指定了打包时依赖的模块; config配置变量,但会被系统环境变量覆盖,使用npm_package_config_NAME的值可能是环境变量的值,使用npm config set PACKNAME:key val完成覆盖;
+	peerDependencies设置插件依赖的主程序版本; license指定使用协议; nodemonConfig.ignore设置哪些文件变更不重启;
+	通过npm_package_NAME读取变量时大小写不敏感. 该json中的属性可以在js代码中使用process.env.npm_package_NAME取得.
+	该文件可以手写生成,或者直接npm init来初始化. 安装配置外的包可以传入参数 --save --save-dev来保存到运行/开发依赖中.
+npm脚本: 在package中定义的script,可以通过npm run NAME调用. 直接使用npm run会显示所有脚本. 由于脚本是shell命令,所以可以使用通配符[通配符传入命令需要转义星号].
+	脚本的传参可以使用--,或者再次封装脚本传递参数. 同时执行多个脚本使用&连接, 如果脚本需要前一个执行成功再执行使用&&连接.
+	默认2个脚本start和install分别对应node service.js/node-gyp rebuild[需要这2个文件存在].
+	脚本拥有生命周期:pre(NAME)和post(NAME)[比如preGet/postGet]. 分别对应调用前/调用后, 可以执行前准备工作和执行后清理工作. 注意不能对pre再监听pre.
+	脚本可以使用package内部变量,比如npm_package_name,bash脚本可以使用%npm_package_name%取值[对象属性也可取值,比如npm_package_TEST_NAME].
+package-lock.json: 在npm install安装时生成的文件,保存了package来源和版本信息. package和lock文件冲突时,以package为准; 不冲突时直接使用lock的版本.
+config模块: 用来读取不同环境的配置文件. 默认首先读取 ./config/default文件[可以通过NODE_CONFIG_DIR来进行替换路径],指定了NODE_ENV变量时会读取对应的匹配文件[默认development]然后merge.
+	取值时直接从config变量取值,还可以使用config.get('NAME')来取值.区别是不存在的值前者返回undefined,后者抛出异常.
+cross-env模块: 跨平台设置node的环境变量. 在脚本中使用cross-env配置可以同时支持windows和linux.
+	原本windows平台使用 set node_env查看环境变量是否存在, set node_env=DEV设置变量, set node_env= 来删除变量, set path=%path%;PATH 追加路径.
+	linux平台使用 echo $NODE_ENV查看是否存在, export NODE_ENV=DEV设置变量, unset NODE_ENV删除变量, export path=$path:PATH追加路径.
+nodemon模块: 可以监视代码变更来重启服务. 默认采用chokidar[针对于node的fs.watch/watchFile做的优化]监控文件变化[legacy-watch -L在chokidar失效时使用轮询模式].
+	可以单独使用nodemon.json来配置,其中: restartable为重启命令的字符串;ignore忽略需要监视的文件;verbose日志模式,输出启动和重启信息;execMap运行服务文件后缀名和命令的匹配关系;
+		events监听事件来触发操作,比如start/crash[崩溃]/exit/restart/config:update[配置变更];watch监听哪些文件要重启;ext监听文件的后缀名;
+	通过nodemon启动服务时,如果需要向js传递参数使用--分割,例如 node app.js -- -L.
+通过vscode调试js: 使用 --inspect/--inspect-brk[第一行代码就会进入断点]来启动[默认启动到9229端口],websockets终端获取uuid,然后http连接该uuid的socket.
+	type写node, request可选launch[程序通过vscode启动]和attach[直接连接启动好的程序], 配置runtimeExecutable为npm, runtimeArgs为package脚本名来运行脚本.
+		protocol写inspector, 端口号对应package脚本inspect命令后的端口.
+	vscode调试画面: 安装debugger for chrome,然后在debug画面添加配置, request写launch, type写chrome, file写画面路径.
+	在chrome的F12点击六边型按钮然后设置连接端口后,可以直接在浏览器调试.
+nodist: node的版本控制工具, 安装前卸载本机的node. 使用nodist命令查看当前安装版本, 使用nodist VER来切换到指定版本[不存在就直接下载], nodist +VER下载版本, nodist -VER删除版本.
+winston模块: 打印日志. 调用log/info/warn()方法打印. 通过不同的transports控制打印到控制台或者文件中.
+process: 该对象是一个全局变量,提供了当前node进程的控制,无需require可用[可以require不报错]. 包含了各种事件用于监听,通过rpm run SCRIPT 才能取得process.env.NAME.
+	beforeExit: 清空事件循环且没有其他安排时调用,接收code为参数,注意手动exit()和异常退出都不会进入该方法; disconnect: IPC通道关闭时触发;
+	exit: 事件循环结束且没有其他操作,或者调用exit()方法都会触发,执行完毕会关闭node无法阻止[比如注册了回调,但是由于node关闭了不会再执行]; message: IPC通信时,接收父进程消息触发;
+	multipleResolves: 多次resolve/reject时会触发; rejectionHandled: 未处理的拒绝列表缩小时触发; unhandledRejection: 未处理拒绝列表增加时触发;
+	uncaughtException: 出现未处理的异常时触发,可能是同步错误或者reject.覆盖了该方法会影响默认行为,不会以'1'作为code退出程序,需要自己控制.在该方法试图恢复程序不安全;
+	warning: 发生警告时触发; 
+	信号事件: node进程接收到信号时触发,在worker线程不可用. 比如 ctrl + c 触发SIGINT. sigterm在window不支持.
+	使用 set[windows] / export[linux] 设置的环境变量在代码中可以通过process.env.NAME取得
+Express可以使用生成器生成模板[express-generator]. 图片等静态资源通过express.static指定目录[可以有多个].
+	可以直接使用EXP.get/post实现简单路由功能[可以是字符串/正则],函数的数组作为路由回调,一组函数可以和一个函数同时作为回调.EXP.all可以接受所有请求[和get/post不冲突].
+	同一path对多个路由的触发顺序由代码声明顺序决定[需要执行next()来向后传递,不执行next或者执行end会结束处理].next()用于进入下一处理.put对应更新操作.
+	response对象: download()提示将要下载的文件; end()结束响应; json()发送json; jsonp()在jsonp支持下发送json; redirect()重定向; render()呈现视图; send()发送响应; sendFile()发送文件.
+		sendStatus()设置响应码.
+	中间件: 执行代码,访问req/res/next[下一个中间件函数],结束请求/响应. EXP.use(MID)使用中间件函数. 可以像路由一样指定中间件的响应PATH. 路由的中间件和express中间件差别只是绑定对象不同.
+	处理错误的中间件有4个参数:err/req/res/next, 调用next时传入非'route'字符串会被认为是错误处理,跳过其他正常系中间件直接进入处理错误的中间件.而next('route')正常进入下一路由处理.
+	express内置了一个错误处理,如果将错误传入next()中就会进入该内置程序.如果开始响应之后[res.headerSend]的调用next触发错误,该内置程序会关闭连接并使请求失效.
+express-promise-router模块: 引入模块创建实例ROUTER, 然后使用ROUTER.use('/PATH', Function)来对指定路径完成路由功能. 第二个参数可以是require文件形式,让该文件进行处理.
+express-http-context模块: 用于在任意方法获得请求上下文信息. 对实例set之后可以在取不到请求地方调用get来取得. 注册方式为use该实例的中间件 httpContext.middleware .
+body-parser模块: 用于解析post请求. 注册方式为use该实例的json方法 bodyParser.json() ,use实例的urlencoded方法 urlencoded{{extened: true}} .
+moment模块: 日期处理库,可以做格式化,包括计算相对时间[得到几小时内],计算日历时间[下星期二],支持多语言.
+ioredis模块: 连接redis数据库时的参数: port/host/pass/outTime/maxRetriesPerRequest/ipv4|ipv6/数据库号[对应select]. 实例可以和redis进行同样的操作,如set//del. 支持Cluster.
+	Cluster: 第一个参数是集群节点的列表[一个失败自动尝试下一个],第二个参数是options对象.
+jsonwebtoken模块: verify方法进行jwt验证,参数是 token/key/options/callback(err, decoded) .
+	jwt: 服务器认证后,生成一个JSON对象返回给客户端.之后客户端请求都需要携带这个JSON[防止用户篡改会添加签名]. 没有换行,使用小数点分割. 分为 头部/负载/签名 3个部分.
+		头部描述了签名算法和token类型. 负载存放传递的数据[jwt默认不加密,不要存放秘密信息][官方字段有: 签发人/过期时间/主题/受众/生效时间/签发时间/编号, 自己也可以定义其他字段].
+		签名用于防止用户篡改[服务器拥有秘钥,使用头部的签名算法生成签名]. 
+		头部和负载使用base64Url转成字符串[因为token有时会拼到url上,而+/=这个3个字符在url中有意义,需要进行转换,加号变成减号,斜线变成下划线,等号忽略].
+		可以放在http的请求头的Authorization里面,也可以放在post请求的数据中. 虽然默认不加密,但是生成的token可以二次加密. 除了认证功能还可以交换信息.
+		除非服务器特殊处理,不然到期前一直有效.所有有效期应该设短,重要权限使用时需要二次确认. 使用https协议.
+express-validator模块: 进行express的check,对要check的值使用check('NAME')方法作为中间件,最后的中间件使用validationResult判断是否通过check[空为通过了check].
+	check方法可以对body/cookies/header/params/query使用,也可以使用body取值之后修改值.注意符号会转成HTML内容.定制check时使用customer传入一个方法,也可以customerSanitizer修改值.
+soap模块: 创建异步客户端createClientAsync(url, options),然后使用then进行回调处理.
+	soap: 基于XML协议,通过http交换信息. XML必须包含 Envelope[必须]/header/body[必须]/fault 元素. Envlope命名空间是http://www.w3.org/2001/12/soap-envlope .如果有header那么要放在第一位.
+XML可以使用命名空间,比如<p>变成<l:p>将p标签声明到l命名空间下.需要指定命名空间l的url,可以在root指定,也可以在当前标签指定 <l:p xmlns="URL"> 或者 <root xmlns="URL"> .
+DTD: 定义XML文档的合法构架模块. 定义在DOCTYPE中,可以指定文档类型,包含元素[ELEMENT]和元素类型.可以写在当前文档或引入外部文件形式.
+XML Schema: 描述XML文档结构,用于代替DTD. 可以指定type. XML属性可以设默认值[default/fixed[不可变更]].
+WSDL: 描述web services以及如何访问的语言. 可以包括 definitions/types[数据类型]/message[参数]/porType[可执行的操作和消息]/binding[消息格式和协议].
+跨域资源共享[请求不同域/协议/端口时,会发起跨域HTTP请求]: CORS[Cross-Origin-Resource-Sharing],W3C标准,可以克服同源限制策略. 针对CORS请求分为简单请求和非简单请求.
+	对于非简单请求,浏览器先使用options方法发起一个预检请求,得知是否可以跨域.确认之后再发起实际的HTTP请求. 预检时也可以通知客户端是否需要认证信息.
+	简单请求: get/head/post请求; 除了被用户代理自动设置的字段[connection/user-agent]和fetch禁用的字段[accept/accept-language/content-language/content-type/dpr/downlink/save-data/
+		viewport-width/width]; content-type仅限 text/plain multipart/form-data/application/x-www-form-urlencoded ; XMLHttpRequestUpload没有注册监听; 请求没有readabledstream对象.	
+	不做处理时,每次非简单请求都会额外请求options一次.可以改成简单请求或者设置Access-Control-Max-Age来缓存预请求结果[单位是秒].
+npx: [主要用于命令行寻址等辅助功能. npm是管理依赖的]避免全局安装命令,比如使用 npx @vue/cli -v 来替换 npm install @vue/cli -g; vue -v;
+	还可以用于本地bin的寻址.有些模块安装后在node_modules/.bin下创建了快捷方式.package脚本可以直接使用,但是命令行不能.而npx可以在命令行使用快捷方式省略目录.
+CLI: Command-Line-Interface 命令行界面.
+Nuxt: 基于Vue的服务端渲染应用框架.也可以使用SPA模式托管单页面程序.可以使用nuxt generate将VUE路由转成HTML文件静态托管.
+	创建Nuxt项目时,可以创建文件夹后手动在package依赖和新建脚本,创建pages目录和文件;也可以使用脚手架npx create-nuxt-app "NAME" 来完成对话创建工程.
+	工程结构: assets存在未编译静态资源[css/image],components目录存放VUE组件,layouts目录存放布局,middleware存放中间件,pages存放路由,plugins存放插件,
+		static不会被Nuxt调用webpack构建,服务启动时映射到根目录,  store组织Vuex状态树, nuxt.config.js覆盖默认配置. ~/@对应srcDir, ~~/@@对应rootDir.
+	配置文件: build压缩; css全局样式; server服务器实例; srcDir源码路径; dir自定义路径; transition过渡效果; rootDir根路径; router覆盖vue-router; dev开发/生产环境; env环境变量;
+		generate配置路由参数; head默认meta标签; loading加载组件; modules添加模块; modulesDir模块路径; plugins插件;
+	路由: 使用nuxt-link标签跳转画面,to属性是目标页面. 动态路由需要文件夹或者文件使用_作为前缀.如果参数是必须,需要创建对应的index.vue,不然路由后面就会带?表示非必须.
+		可以添加校验方法,返回非true/resolve(false)/抛出异常 来加载404/500页面. 创建和vue文件同名的目录作为嵌套路由,使用nuxt-child显示子视图.
+	视图: Nuxt的渲染使用 HTML模板>布局>页面形式. 默认html模板在src[根目录]下的app.html,默认的布局在layouts/default.vue[其中<nuxt/>标签显示页面],错误页面是layouts/error.vue
+		新建布局可以通过组件的layouts属性指定. 页面本质是vue组件,Nuxt添加了特殊配置[asyncData]来异步处理数据,加载组件会调用.
+	nuxt命令默认启动3000端口, 可以nuxt --hostname NAME --port PORT来配置启动端口,或者在nuxt.config.js中的server属性中配置,也可使用环境变量配置[HOST=XX POST=XX]
+	其他配置参考 'nuxtjs.cn'.
+dotenv模块: 读取.env文件. 加载后调用 DOT.config方法将读取到的配置添加到process并返回一个对象,该对象的parsed属性是环境变量的key/val.
+	config方法可以指定路径{path: PATH}, 不指定默认是当前路径下的.env文件. {encoding: ENC}配置字符集,默认UTF8. env文件可能携带隐私数据,不要放到版本管理中.
+客户端渲染: CSR[Client-Side-Render]
+服务端渲染: SSR[Service-Side-Render] 可以解决SEO问题,让搜索引擎更好抓取内容[ajax动态渲染不能被抓取]. 更快的到达时间[time-to-content],针对机器慢或者网络慢,无需全部js下载完就可以渲染.
+	问题是特定代码只能在某些声明周期使用,外部库需要特殊处理; 服务器需要Node Server环境; 服务器负载更大.
+
+
+
+
+
+
+
+
+
+
