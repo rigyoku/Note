@@ -103,7 +103,9 @@ dotenv模块: 读取.env文件. 加载后调用 DOT.config方法将读取到的�
 客户端渲染: CSR[Client-Side-Render]
 服务端渲染: SSR[Service-Side-Render] 可以解决SEO问题,让搜索引擎更好抓取内容[ajax动态渲染不能被抓取]. 更快的到达时间[time-to-content],针对机器慢或者网络慢,无需全部js下载完就可以渲染.
 	问题是特定代码只能在某些声明周期使用,外部库需要特殊处理; 服务器需要Node Server环境; 服务器负载更大.
-
+Require加载是node和es6都支持的,而export/import只有es6支持,module.exports/exports只有node支持.
+	其中exports只是module.exports的引用,尽量使用module.exports来导出.
+	通过export导出的模块相当于一个多属性的对象,引用时需要加{}来解构. export可以直接导出表达式,default则不能. export可以有多个,default只能有一个.
 
 
 
