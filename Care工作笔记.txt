@@ -349,8 +349,23 @@ Vuex: 可以把state分割成不同的模块,创建store实例时通过modules�
 异或运算: XOR[exclusive or缩写],更纯粹的或运算.只有在一个true另一个false在返回true.使用^表示. 异或运算存在交换律和结合律[类似数学加法].
 	连续的异或运算可以实现两个值的交换. 因为同值异或返回false,和false异或返回本身,所以可以用于加密运算. 同样该逻辑也可以用于2个文件备份,生成一个备份文件,缺失任意一份可以由剩余2份算出.
 	通过异或可以找出数组中缺失的数字.
-
-
+VueRouter: 使用router-link作为标签,在画面被解析为a标签进行渲染. 使用to属性指向目标路径,对应vueRouter中的path映射的组件,该组件被渲染到router-view标签中.
+	this.$route指向当前路由,this.$router指向路由器.
+	动态路由用于传参数给组件渲染的情况.路径参数使用:冒号开头.组件内部使用this.$route.params取得参数对象.多段路由参数都会传入params对象中.
+	参数变化会复用组件,导致生命周期不会再次调用.可以使用watch监听$route对象变化或者使用导航守卫方式[beforeRouteUpdate].
+	路径中,*星号匹配任意字符,可以路径中混杂星号.$route.params的pathMatch属性返回路由的匹配部分.
+	路由按照定义的先后顺序被使用,最后使用*全匹配处理404请求.
+	使用routes属性的children属性实现嵌套路由,可以在组件下继续渲染子组件. 比如在/user/:id下渲染name路由 /user/:id/name. children中的path默认连接在当前路径之后,使用斜线开头连接在根路径.
+	画面使用to可以切换路由,代码可以通过this.$router.push('PATH')/push({path: 'PATH'})/push({name: 'NAME', params: 'PARAMS'})/push({path: 'PATH', query: {id: 'ID'}})切换路由.
+		注意传递path会导致params无效[因为path包含了param].
+		replace方法和push类似,但是不会添加到history的记录,而是进行替换.可以传入第二,三个参数作为onComplete[导航完成],onAbort[终止]回调.
+		#route.go(N)接收整数作为参数,在history中前进/后退[传入负数]N步,类似window.history.go(N).
+	路由除了path标识,还可以通过name标识,作为命名路由.在router-link的to标签或者push时将path换成name即可.
+	画面除了嵌套路由还可以同级显示多个路由,在router-view标签添加name属性来对应渲染指定命名路由.
+		注册时将component替换成components属性.该属性包含了默认路由default和命名路由的key和映射组件.可以配合嵌套路由一起使用.
+	创建路由时,除了component属性还可以使用redirect来实现重定向功能[改变URL].该属性值可以是路径,也可以是命名路由,还可以是一个方法返回路径或者命名路由[参数是目标路由].
+		跳转路由不会应用路由守卫,而目标路由会. alias属性可以为路由起别名,访问别名时,url保持不变,解析为当前路由.这样可以实现任意结构的url和ui做映射,而不局限于嵌套路由.
+	组件使用$route会造成耦合,使用props可以解耦合.创建路由实例时设置props属性为true[命名视图需要为每个视图指定props属性],在组件中就可以使用props接收.
 
 
 
