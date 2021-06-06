@@ -109,7 +109,7 @@ underscore: _.throttle在接到任务后计时15秒,到时间执行所有任务.
 	_.defer延迟执行方法[参数作为调用方法的参数],直到同步队列执行完毕再执行,相当于0ms的setTimeout.
 	_.invoke根据method对参数数组的元素执行方法.
 	_.find(list, function)用于遍历属性,查找出方法返回true的元素.
-	_.each在遍历过程中改变数组不会影响遍历,而数组本身的forEach方法遍历时更改数组会影响遍历.
+	_.each在遍历过程中改变数组不会影响遍历次数,而数组本身的forEach方法遍历时更改数组会影响遍历.
 console.dir(obj)可以列出对象所有属性和方法.
 创建httpUrlConnection时,是本地向URL创建一个流. 从URL向本地为输入, 从本地向URL为输出.
 SQL插入单引号时需要把单引号换成2个单引号.
@@ -189,7 +189,7 @@ Vue: 改变Vue.data的值,画面就会重新渲染. 自定义的组件就是一�
 	声明周期包括: beforeCreate/created/beforeMount/mounted/beforeUpdate/updated/beforeDestory/destoryd
 	{{CONTENT}}可以直接输出内容, v-html="CONTENT"会把内容当做HTML渲染, 不要随意渲染HTML[可能导致XSS攻击].
 	{{}}内也可以写单个表达式[语句和if等流程控制无效]. 模板的表达式都放在沙河中,这能访问到全局变量的一个白名单[Date,Math等],无法访问用户自定义全局变量.
-	v-bind简写成:, v-on简写成@. data是数据,computed是计算属性[属性内方法作为全局变量的get方法,里面的this指向data],可以替换watch监听.
+	v-bind简写成:, v-on简写成@. data是数据,computed是计算属性[属性内方法作为全局变量的get方法,里面的this指向data],可以替换watch监听[watch可以处理异步情况].
 	method是方法,在模板用{{Function()}}调用方法和计算属性效果类型,区别是计算属性基于缓存[值不变就不更新],而方法每次调用都更新.
 	计算属性默认只有get没有set,有需要可以自定义,在为计算属性赋值时调用set. 只有在数据变化时需要执行异步操作或者开销较大时才使用watch监听[监听v-model的值].
 	为组件添加class不会覆盖原有class. :style={}可以设置css样式,可以直接写data的属性. v-if对应v-else和v-else-if.
@@ -235,6 +235,10 @@ Vue: 改变Vue.data的值,画面就会重新渲染. 自定义的组件就是一�
 	keep-alive解决了动态组件切换时渲染性能问题,第一次被创建好之后被缓存下来. 将动态组件用keep-alive标签包裹即可,但是要求组件有自己的名字.
 	使用工厂函数定义异步组件,resolve返回组件定义,也可以reject拒绝.
 	不要手动操作dom或者另一个组件实例的内部.
+	使用 DATA | Filter 形式使用过滤器,在组件中使用filters定义过滤器,也可以Vue.filter全局定义.
+	组件添加mixins属性设置混入数组实现混入属性.实现了封装复用.混入冲突时,方法和data以组件为准,监听和声明周期都执行,先执行混入.
+	Vue3的插件和Vue2不兼容.
+	使用cli创建的项目,启动时的--mode参数可以配置对应的根目录下的 .env.NAME 文件中的 VUE_APP 开头的变量会添加到环境变量
 敏捷开发=迭代开发+增量开发.不断重复的进行规划/设计/编码/测试/评估,每个版本都会增加用户可以感知的完整功能.
 配色法则: 主题使用深色[c,f,6,9],浅色使用[a,b,c,d,e,f]
 	文字不要用全黑,可以使用深蓝色[1a2a3a-7a8a9a]
@@ -317,7 +321,7 @@ Redis: 启动服务: 进入解压文件夹后, 命令行执行 redis-server.exe 
 	数据类型:string[单个键值对]/ hash[对象,键值对集合]/ list[数组]/ set[集合,唯一性]/ zset[有序集合,从小到大]
 	操作: string操作: set key vaule赋值. get key取值. 在赋值时,相同的key会后者覆盖前者[key类型需要一样]. del key删除. hash操作: hmset/hget来赋值和取值.
 		list操作: lpush/lrange来赋值和取值. set操作: sadd/smenbers来赋值和取值. zset操作: zadd/zrangebyscore取值[zset虽然值不能重复,但是排序的score可以重复].
-vscode的插件安装到c盘用户下的.vscode文件夹.
+vscode的插件安装到c盘用户下的.vscode文件夹. 安装Vetur插件编辑.vue文件更好.
 keyup事件需要键盘抬起触发,而直接tab或者不松开键盘就通过鼠标移走焦点不会触发该事件.而且disabled元素也会触发keyup事件.
 document.execCommand()可以操作剪贴板,执行copy/paste/cut方法.先选中dom[select]后,再执行命令即可修改剪贴板内容.同步操作容易卡顿,由于安全性问题被禁止.
 ClipBoardAPI异步操作剪贴板: navigator.clipboard返回剪贴板对象.如果返回的undefined说明浏览器不支持该API.权限分为读和写,其中写权限默认拥有,而读取需要用户赋予.
@@ -346,6 +350,7 @@ Vuex: 可以把state分割成不同的模块,创建store实例时通过modules�
 	由于状态只能mutation改变,直接使用v-model不可以.可以自己写赋值和改变方法,或者使用v-model时对属性添加set/get来保证值的来源和只能通过mutation变更.
 	对于get和mutation测试可以直接调用,而action测试需要对api做mock来测试.
 	热重载需要调用store.hotUpdate().
+	想要state和画面双向绑定,需要放到组件的计算属性中.
 异或运算: XOR[exclusive or缩写],更纯粹的或运算.只有在一个true另一个false在返回true.使用^表示. 异或运算存在交换律和结合律[类似数学加法].
 	连续的异或运算可以实现两个值的交换. 因为同值异或返回false,和false异或返回本身,所以可以用于加密运算. 同样该逻辑也可以用于2个文件备份,生成一个备份文件,缺失任意一份可以由剩余2份算出.
 	通过异或可以找出数组中缺失的数字.
@@ -366,8 +371,11 @@ VueRouter: 使用router-link作为标签,在画面被解析为a标签进行渲�
 	创建路由时,除了component属性还可以使用redirect来实现重定向功能[改变URL].该属性值可以是路径,也可以是命名路由,还可以是一个方法返回路径或者命名路由[参数是目标路由].
 		跳转路由不会应用路由守卫,而目标路由会. alias属性可以为路由起别名,访问别名时,url保持不变,解析为当前路由.这样可以实现任意结构的url和ui做映射,而不局限于嵌套路由.
 	组件使用$route会造成耦合,使用props可以解耦合.创建路由实例时设置props属性为true[命名视图需要为每个视图指定props属性],在组件中就可以使用props接收.
-
-
+使用npm install @vue/cli -g全局安装vue-cli脚手架,通过vue create NAME创建或者启动图形化界面vue ui.
+	启动ui如果提示rcPath错误,可以在@vue/cli下复制一份lib,再粘贴到@vue/cli/node_modules/@vue/cli下.
+socket.io的跨域配置的不是路由跨域[express的get等],而是由server创建Socket实例时的第二个参数,先配置allowEIO3为true,不然报错400;
+	然后配置cors属性,其中origin属性为url的数组. 注意: 由于socket是挂在server上的,最后listen的是server而不是express实例!
+	vue-socket.io如果把路径写在url上相当于命名空间,需要在api使用of来区分命名空间[和options的path不等价].
 
 
 
