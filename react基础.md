@@ -194,6 +194,9 @@
 * 注意将高阶组件的内部组件的props向下传递, 防止调用时指定的props丢失
 * 本质是将复用组件作为泛化组件的父组件来传递props
 
+##### Ract.momo
+* 一个高阶组件, 在传入的组件的props不变时, 不进行更新(也是浅比较)
+
 ### 纯组件
 * 使用class创建组件时, 不再继承 React.Component, 而是继承 PureComponent
 * 内部自动实现了 shouldComponentUpdate 方法, 不再需要手动对比优化
@@ -532,18 +535,27 @@ graph LR;
 * React 16.8新增特性, 在函数组件也可以使用state(即React更推荐函数组件了)
 * 目前主推
 
+### 规则
+* 只能写在函数组件中, 不能写在类组件中
+* 不能在循环, 条件语句中调用
+    * 因为hook的执行顺序要固定
+* 不能在普通js函数调用hook
+
 ### useState
 * 让函数组件可以拥有state
 * 参数是初始化的值
 * 返回值是数组, 数组第一项是取得state, 第二项是为setState方法
     * 该setState同样可以使用对象赋值或者回调赋值, 但是不支持第二个回调参数
+    * 同样是异步的
 * useState只有第一次执行时对state初始化
+* 初始化可以使用函数形式, 函数返回值是初始化的值
+* 采用纯组件形式进行对比数据, 浅比较相同则不更新且不调用effect
 
 ### useEffect
 * 让函数组件可以拥有生命周期
-* 第一个参数是函数, 在初始化以及状态变化时调用该函数, 该参数返回的函数作为 componentWillUnmount
+* 第一个参数是函数, 在初始化以及状态变化时调用该函数, 该函数返回的函数在监听到状态变更时先调用, 然后重新执行参数函数
 * 第二个参数是要监测的对象的数组, 不传入时默认监测所有对象
-    * 空数组相当于 componentDidMount    
+    * 空数组相当于 componentDidMount + 返回componentWillUnmount
     * 不传入或者传入state相当于 componentDidMount + componentDidUpdate
 
 ### useRef
@@ -551,6 +563,36 @@ graph LR;
 * 调用该函数创建ref容器并赋值给元素的ref属性
 * 取值时依旧使用ref容器.current
 
+### useContext
+* 接收createContext创建的context对象作为参数, 返回该context对象当前的值
+* 值由上层组件最新的context.provider提供的value决定
+* 使用了该hook的组件可能存在性能问题
 
+### useReducer
+* 用于多条件state处理, 类似reducer逻辑
+* 接收参数不再像useState一样只有初始化数据, 而是3个参数
+    * 第一个是reducer
+        * reducer就是接收state+action, 根据action的type对state进行处理并返回
+        * action也是type+payload结构
+    * 第二个是初始值
+    * 第三个是初始化函数(可选参数, 用于处理第二个参数)
+* 返回值的state和dispatch方法, 后续调用dispatch方法传入自己创建的action
 
+### useCallback
+* 用于解决组件函数中, 每次重新渲染都会导致方法重新定义的问题(当定义的方法作为props传递给子组件时, 由于索引变更, 导致无谓的更新)
+    * 在所依赖的数据不变时, useCallback返回的是同一个函数对象(索引相同)
+    * 参数1是要返回的回调函数
+    * 参数2是监听的数据数组
 
+### useMemo
+* useMemo(() => fn, [a,b]) 等价于 useCallback(fn, [a,b])
+* 使用场景是需要经过复杂计算返回的值, 这样在依赖未变更时不去重新计算(类似vue的计算属性)
+* 只能写在函数式组件中
+* 在依赖的状态变更时, 执行参数1的方法, 内部不要写渲染无关逻辑
+    * 其他逻辑写在effect中
+* 可以返回jsx
+
+### 自定义hook
+* 以use开头的函数, 内部可以调用其他hook
+* 使用时直接调用该函数, 并取得返回值
+* 像useState一样, 多次调用也是互相独立的
