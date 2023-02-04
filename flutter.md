@@ -87,3 +87,40 @@
 ### Stack
 * 层叠布局组件
 * 配合Position实现绝对定位
+    * 相对于外部容器定位, 没有外部容器就相对于屏幕定位
+    * 如果嵌套了Row, 那么需要指定宽度, 不能使用无限大, 可以使用FlutterMediaQuery取得屏幕大小
+    
+### Align
+* center组件继承自Align, 控制位置的组件
+* alignment除了可以传枚举, 还可以Alignment(num, num)
+
+### AspectRatio
+* 控制容器宽高比的组件
+
+### Card
+* 卡片组件
+
+### CircleAvatar
+* 圆形组件
+
+### 按钮组件
+* 大小可以设置容器大小
+
+#### ElevateButton
+* 突起按钮, onPressed点击事件, .icon命名构造函数带图片
+
+#### TextButton
+* 文本按钮
+
+#### OutlinedButton
+* 带边框按钮
+
+#### IconButton
+* 图标按钮
+
+### Wrap
+* 主轴放不下换行/列
+
+### 有状态组件
+* 能重新渲染的组件
+* 通过setState更新数据并反应到画面(重新build组件)
