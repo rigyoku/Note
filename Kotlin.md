@@ -114,3 +114,22 @@
 * 也是class关键字
 * 继承使用:, 而不是extends
     * 自定义异常可以继承IllegalArgumentException
+
+
+
+
+## Android
+
+### fragment
+* 嵌套在Activity中, 多个activity可以是使用同一个fragment
+* name指定class, layout指定view
+* view中的context属性对应class, 对应Binding, 用XXBinding.inflate初始化
+
+### 进程
+* 不写process, 在主进程(包名)
+* <service android:name=".Service" android:process=":test"></service>
+* 冒号开头是私有进程, 会启动单独进程
+* 直接写字符串, 全局进程, 需要权限
+* 可以加activity/service之类上, 也可以加到application上控制整体进程, 在logcat中显示location:进程名, 也是Forked child process创建的 
+* 在子进程创建不写process的进程, 会出现在主进程中
+* 子进程会单独创建application
